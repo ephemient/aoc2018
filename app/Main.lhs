@@ -1,6 +1,8 @@
 # [Advent of Code 2018](https://adventofcode.com/2018)
 ### my answers in [Haskell](https://www.haskell.org/)
 
+[![Build Status](https://travis-ci.org/ephemient/aoc2018.svg)](https://travis-ci.org/ephemient/aoc2018)
+
 This project builds with [The Haskell Tool Stack](https://haskellstack.org/).
 
 Setup:
