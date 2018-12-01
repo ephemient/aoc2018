@@ -13,8 +13,8 @@ spec = do
             day1a "-1\n-2\n-3" `shouldBe` -6
     describe "part 2" $
         it "examples" $ do
-            day1b "+1\n-2\n+3\n+1" `shouldBe` 2
-            day1b "+1\n-1" `shouldBe` 0
-            day1b "+3\n+3\n+4\n-2\n-4" `shouldBe` 10
-            day1b "-6\n+3\n+8\n+5\n-6" `shouldBe` 5
-            day1b "+7\n+7\n-2\n-7\n-4" `shouldBe` 14
+            day1b "+1\n-2\n+3\n+1" `shouldBe` Just 2
+            day1b "+1\n-1" `shouldBe` Just 0
+            day1b "+3\n+3\n+4\n-2\n-4" `shouldBe` Just 10
+            day1b "-6\n+3\n+8\n+5\n-6" `shouldBe` Just 5
+            day1b "+7\n+7\n-2\n-7\n-4" `shouldBe` Just 14

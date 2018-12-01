@@ -83,5 +83,5 @@ run day readIO showIO funcs = do
 
 main :: IO ()
 main = do
-    run 1 getDayInput print [day1a, day1b]
+    run 1 getDayInput putStrLn [show . day1a, maybeBottom show . day1b]
 ```
