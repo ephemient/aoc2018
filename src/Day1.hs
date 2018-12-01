@@ -6,7 +6,7 @@ Description:    <https://adventofcode.com/2018/day/1 Day 1: Chronal Calibration>
 module Day1 (day1a, day1b) where
 
 import Data.List (scanl')
-import Data.Set (empty, insert, member)
+import Data.IntSet (empty, insert, member)
 
 parse :: String -> [Int]
 parse = map (read . dropWhile (== '+')) . lines
