@@ -1,6 +1,6 @@
 {-|
 Module:         Day1
-Description:    <http://adventofcode.com/2018/day/1 Day 1: Chronal Calibration>
+Description:    <https://adventofcode.com/2018/day/1 Day 1: Chronal Calibration>
 -}
 {-# OPTIONS_HADDOCK ignore-exports #-}
 module Day1 (day1a, day1b) where

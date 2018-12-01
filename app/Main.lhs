@@ -1,4 +1,4 @@
-# [Advent of Code 2018](http://adventofcode.com/2018)
+# [Advent of Code 2018](https://adventofcode.com/2018)
 ### my answers in [Haskell](https://www.haskell.org/)
 
 This project builds with [The Haskell Tool Stack](https://haskellstack.org/).
