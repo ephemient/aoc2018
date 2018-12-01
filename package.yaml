@@ -42,3 +42,27 @@ executables:
 
 data-files:
 - day*.txt
+
+tests:
+  aoc2018-test:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2018
+    - hspec
+
+benchmarks:
+  aoc2018-bench:
+    main:                Main.hs
+    source-dirs:         bench
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2018
+    - criterion

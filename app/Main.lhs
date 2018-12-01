@@ -10,10 +10,29 @@ curl -sSL https://get.haskellstack.org/ | sh -s -
 stack setup
 ```
 
+Run the [HSpec](https://hspec.github.io/) test suite:
+
+```sh
+stack test aoc2018:test:aoc2018-test
+```
+
+Run [criterion](http://www.serpentine.com/criterion/) benchmarks:
+
+```sh
+stack bench aoc2018:bench:aoc2018-bench
+```
+
 Print solutions for the inputs provided in local data files:
 
 ```sh
 stack build aoc2018:exe:aoc2018-exe --exec aoc2018-exe
+```
+
+Generate [Haddock](https://www.haskell.org/haddock/) API documentation
+(rendered at [ephemient.github.io/aoc2018](https://ephemient.github.io/aoc2018)):
+
+```sh
+stack haddock aoc2018:lib
 ```
 
 ---
