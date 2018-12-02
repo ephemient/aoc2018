@@ -15,3 +15,8 @@ day1a :: String -> Int
 --   running sums are grouped by the | remainder modulus total sum, then
 --   the first smallest inter-group gap (if any) is returned.
 day1b :: String -> Maybe Int
+
+
+module Day2
+day2a :: String -> Int
+day2b :: String -> Maybe String
