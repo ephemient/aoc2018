@@ -13,6 +13,9 @@ cache:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
 
+install:
+- ./gradlew assemble jmhCompile
+
 script:
 # Build the package, its tests, its benchmarks, and its docs and run the tests and benchmarks
 - ./gradlew check dokka jmh
