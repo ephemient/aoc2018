@@ -1,0 +1,18 @@
+# Use new container infrastructure to enable caching
+sudo: false
+
+# https://docs.travis-ci.com/user/languages/java/
+language: java
+
+# https://docs.travis-ci.com/user/languages/java/#caching
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
+
+script:
+# Build the package, its tests, its benchmarks, and its docs and run the tests and benchmarks
+- ./gradlew check dokka jmh
