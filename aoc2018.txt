@@ -12,6 +12,6 @@ module Day1
 day1a :: String -> Int
 
 -- | Returns a repeat if found within a single cycle; otherwise, the
---   running sums are grouped by the | total sum, then the first smallest
---   inter-group gap (if any) is returned.
+--   running sums are grouped by the | remainder modulus total sum, then
+--   the first smallest inter-group gap (if any) is returned.
 day1b :: String -> Maybe Int
