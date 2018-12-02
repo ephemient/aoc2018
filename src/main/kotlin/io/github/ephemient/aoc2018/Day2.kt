@@ -16,12 +16,4 @@ class Day2(private val lines: List<String>) {
         }
         return null
     }
-
-    companion object {
-        fun main(args: Array<String>) {
-            val day2 = Day2(Day2::class.java.classLoader.getResourceAsStream("day2.txt").bufferedReader().readLines())
-            println(day2.part1())
-            println(day2.part2())
-        }
-    }
 }
