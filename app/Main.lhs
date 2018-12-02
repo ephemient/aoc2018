@@ -1,7 +1,7 @@
 # [Advent of Code 2018](https://adventofcode.com/2018)
-### my answers in [Haskell](https://www.haskell.org/)
+### my answers in [Haskell](https://www.haskell.org/) (see also [Kotlin branch](https://github.com/ephemient/aoc2018/tree/kotlin))
 
-[![Build Status](https://travis-ci.org/ephemient/aoc2018.svg)](https://travis-ci.org/ephemient/aoc2018)
+[![Build Status](https://travis-ci.org/ephemient/aoc2018.svg?branch=master)](https://travis-ci.org/ephemient/aoc2018)
 
 This project builds with [The Haskell Tool Stack](https://haskellstack.org/).
 
@@ -35,6 +35,12 @@ Generate [Haddock](https://www.haskell.org/haddock/) API documentation
 
 ```sh
 stack haddock aoc2018:lib
+```
+
+Run [hlint](https://github.com/ndmitchell/hlint) source code suggestions:
+
+```sh
+stack build hlint --exec 'hlint src test bench'
 ```
 
 ---

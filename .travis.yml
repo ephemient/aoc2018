@@ -24,7 +24,9 @@ before_install:
 install:
 # Build dependencies
 - stack --no-terminal --install-ghc build --test --bench --only-dependencies
+- stack --no-terminal build hlint
 
 script:
 # Build the package, its tests, its benchmarks, and its docs and run the tests and benchmarks
+- stack --no-terminal exec -- hlint src test bench
 - stack --no-terminal build --test --bench --haddock --no-haddock-deps
