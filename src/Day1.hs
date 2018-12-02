@@ -5,6 +5,7 @@ Description:    <https://adventofcode.com/2018/day/1 Day 1: Chronal Calibration>
 {-# LANGUAGE TransformListComp #-}
 module Day1 (day1a, day1b) where
 
+import Control.Applicative ((<|>))
 import Data.List (find, scanl', tails)
 import Data.IntSet (empty, insert, member)
 import Data.Maybe (listToMaybe)
@@ -17,9 +18,9 @@ day1a :: String -> Int
 day1a = sum . parse
 
 -- | Returns a repeat if found within a single cycle; otherwise, the running sums are grouped by the
--- | total sum, then the first smallest inter-group gap (if any) is returned.
+-- | remainder modulus total sum, then the first smallest inter-group gap (if any) is returned.
 day1b :: String -> Maybe Int
-day1b input = maybe afterLoop Just beforeLoop
+day1b input = beforeLoop <|> afterLoop
   where list = scanl' (+) 0 $ parse input
         beforeLoop = fmap fst . find (uncurry member) . zip list $ scanl (flip insert) empty list
         total = last list
