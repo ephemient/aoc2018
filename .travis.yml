@@ -30,3 +30,12 @@ script:
 # Build the package, its tests, its benchmarks, and its docs and run the tests and benchmarks
 - stack --no-terminal exec -- hlint src test bench
 - stack --no-terminal build --test --bench --haddock --no-haddock-deps
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  local-dir: .stack-work/dist/x86_64-linux/Cabal-2.2.0.1/doc/html/aoc2018
+  keep-history: true
+  on:
+    branch: master
