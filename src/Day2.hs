@@ -3,12 +3,14 @@ Module:         Day2
 Description:    <https://adventofcode.com/2018/day/2 Day 2: Inventory Management System>
 -}
 {-# LANGUAGE TupleSections, ViewPatterns #-}
-module Day2 (day2a, day2b) where
+module Day2 (day2a, day2b, day2b') where
 
 import Control.Arrow ((***))
+import Control.Monad (ap)
 import Data.Function (on)
-import Data.List (tails)
-import Data.Map.Strict (Map, elems, fromListWith)
+import Data.List (inits, nub, tails)
+import Data.Map.Strict (Map, elems, fromListWith, keys)
+import qualified Data.Map.Strict as Map
 import Data.Maybe (catMaybes, isNothing, listToMaybe)
 import Data.Monoid (Sum(Sum, getSum), Any(Any))
 
@@ -30,3 +32,11 @@ day2b (lines -> input) = listToMaybe
   , let matches = zipWith (\a b -> if a == b then Just a else Nothing) one two
   , length (filter isNothing matches) == 1
   ]
+
+day2b' :: String -> Maybe String
+day2b' (lines -> input) =
+    fmap (uncurry (++)) . listToMaybe . keys . Map.filter ((> 1) . length . nub) $ fromListWith (++)
+      [ ((init, tail), [c])
+      | line <- input
+      , (c, init, tail) <- zip3 line (inits line) (tails $ drop 1 line)
+      ]

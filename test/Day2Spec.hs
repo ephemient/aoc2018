@@ -1,6 +1,6 @@
 module Day2Spec (spec) where
 
-import Day2 (day2a, day2b)
+import Day2 (day2a, day2b, day2b')
 import Test.Hspec (Spec, describe, it, shouldBe)
 
 spec :: Spec
@@ -11,3 +11,6 @@ spec = do
     describe "part 2" $
         it "examples" $
             day2b "abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz" `shouldBe` Just "fgij"
+    describe "part 2'" $
+        it "examples" $
+            day2b' "abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz" `shouldBe` Just "fgij"

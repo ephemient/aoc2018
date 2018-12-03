@@ -58,7 +58,7 @@ import Day1 (day1a, day1b)
 ```
 ## [Day 2: Inventory Management System](/src/Day2.hs)
 ```haskell
-import Day2 (day2a, day2b)
+import Day2 (day2a, day2b, day2b')
 ```
 
 ---
@@ -94,5 +94,5 @@ run day readIO showIO funcs = do
 main :: IO ()
 main = do
     run 1 getDayInput putStrLn [show . day1a, maybeBottom show . day1b]
-    run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b]
+    run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b, maybeBottom id . day2b']
 ```
