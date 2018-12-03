@@ -60,6 +60,10 @@ import Day1 (day1a, day1b)
 ```haskell
 import Day2 (day2a, day2b)
 ```
+## [Day 3: No Matter How You Slice It](/src/Day3.hs)
+```haskell
+import Day3 (day3a, day3b)
+```
 
 ---
 
@@ -95,4 +99,5 @@ main :: IO ()
 main = do
     run 1 getDayInput putStrLn [show . day1a, maybeBottom show . day1b]
     run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b]
+    run 3 getDayInput putStrLn [show . day3a, maybeBottom show . day3b]
 ```
