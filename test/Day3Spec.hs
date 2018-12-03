@@ -7,7 +7,7 @@ spec :: Spec
 spec = do
     describe "part 1" $
         it "examples" $
-            day3a sample `shouldBe` 4
+            day3a sample `shouldBe` Just 4
     describe "part 2" $
         it "examples" $
             day3b sample `shouldBe` Just 3

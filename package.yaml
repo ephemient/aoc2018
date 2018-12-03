@@ -27,6 +27,7 @@ library:
   dependencies:
   - array
   - containers
+  - megaparsec
 
 executables:
   aoc2018-exe:

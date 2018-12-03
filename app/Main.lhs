@@ -99,5 +99,5 @@ main :: IO ()
 main = do
     run 1 getDayInput putStrLn [show . day1a, maybeBottom show . day1b]
     run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b]
-    run 3 getDayInput putStrLn [show . day3a, maybeBottom show . day3b]
+    run 3 getDayInput (putStrLn . maybeBottom show) [day3a, day3b]
 ```
