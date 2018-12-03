@@ -41,8 +41,13 @@ tasks.test {
     testLogging.showStandardStreams = true
 }
 
+val jmhExclude: String? by project
+val jmhInclude: String? by project
+
 jmh {
     benchmarkMode = listOf("sample")
+    if (!jmhExclude.isNullOrEmpty()) exclude = listOf(jmhExclude)
+    if (!jmhInclude.isNullOrEmpty()) include = listOf(jmhInclude)
     fork = 1
     threads = 1
     timeOnIteration = "1s"
