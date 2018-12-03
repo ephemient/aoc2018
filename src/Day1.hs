@@ -26,7 +26,7 @@ day1b input = beforeLoop <|> afterLoop
         total = last list
         afterLoop = listToMaybe
           [ endValue
-          | (n, z) <- zip [0..] $ tail list
+          | (n, z) <- zip [0 :: Int ..] $ tail list
           , then group by z `mod` total using groupWith
           , (gap, startIndex, endValue) <-
               [ (abs $ y - x, startIndex, endValue)
