@@ -23,7 +23,8 @@ Print solutions for the inputs provided in local data files:
 ./gradlew run
 ```
 
-Generate [Dokka](https://github.com/Kotlin/dokka) API documentation:
+Generate [Dokka](https://github.com/Kotlin/dokka) API documentation
+(rendered by [JitPack](https://jitpack.io/com/github/ephemient/aoc2018/kotlin-SNAPSHOT/javadoc/aoc2018/index.html)):
 
 ```sh
 ./gradlew dokka

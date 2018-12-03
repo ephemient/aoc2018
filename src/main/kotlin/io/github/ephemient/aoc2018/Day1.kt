@@ -49,6 +49,6 @@ class Day1(lines: List<String>) {
         val endValue: Int
     ) : Comparable<Result> {
         override fun compareTo(other: Result): Int =
-            gap.compareTo(other.gap)?.takeIf { it != 0 } ?: startIndex.compareTo(other.startIndex)
+            gap.compareTo(other.gap).takeIf { it != 0 } ?: startIndex.compareTo(other.startIndex)
     }
 }

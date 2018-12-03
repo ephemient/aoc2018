@@ -4,6 +4,7 @@ plugins {
     id("org.jmailen.kotlinter") version "1.20.1"
     application
     id("me.champeau.gradle.jmh") version "0.4.7"
+    `maven-publish`
 }
 
 repositories {
@@ -25,6 +26,16 @@ dependencies {
     jmhImplementation(kotlin("stdlib-jdk8"))
 }
 
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
 tasks.test {
     useJUnitPlatform()
     testLogging.showStandardStreams = true
@@ -39,7 +50,29 @@ jmh {
     warmupIterations = 1
 }
 
-task<JavaExec>("ktlintIdea") {
+val dokka by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class) {
+    includes = listOf("README.md")
+    jdkVersion = 8
+    linkMappings.add(org.jetbrains.dokka.gradle.LinkMapping().apply {
+        dir = "src"
+        url = "https://github.com/ephemient/aoc2018/blob/kotlin/src"
+        suffix = "#L"
+    })
+}
+
+publishing {
+    publications {
+        create<MavenPublication>(project.name) {
+            val dokkaJar by tasks.creating(Jar::class) {
+                from(dokka)
+                classifier = "javadoc"
+            }
+            artifact(dokkaJar)
+        }
+    }
+}
+
+val ktlintIdea by tasks.creating(JavaExec::class) {
     group = "IDE"
     description = "Apply ktlint style to IntelliJ IDEA project."
     main = "com.github.shyiko.ktlint.Main"
@@ -47,6 +80,6 @@ task<JavaExec>("ktlintIdea") {
     args("--apply-to-idea", "-y")
 }
 
-tasks.getByName<Wrapper>("wrapper") {
+tasks.wrapper {
     gradleVersion = "5.0"
 }
