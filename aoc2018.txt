@@ -20,3 +20,10 @@ day1b :: String -> Maybe Int
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
+
+
+module Day3
+day3a :: String -> Int
+day3b :: String -> Maybe Int
+instance (GHC.Read.Read id, GHC.Num.Num dim, GHC.Read.Read dim) => GHC.Read.Read (Day3.Claim id dim)
+instance GHC.Classes.Ord dim => GHC.Base.Semigroup (Day3.Area dim)
