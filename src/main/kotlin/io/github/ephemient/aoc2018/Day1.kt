@@ -23,9 +23,9 @@ class Day1(lines: List<String>) {
             .values
             .flatMap { group ->
                 group.withIndex().flatMap { (n, ix) ->
-                    group.drop(n + 1).map { jy ->
+                    (n + 1..group.lastIndex).map { m ->
                         val (i, x) = ix
-                        val (j, y) = jy
+                        val (j, y) = group[m]
                         val startIndex: Int
                         val endValue: Int
                         if ((total < 0) == (x < y)) {
@@ -39,7 +39,7 @@ class Day1(lines: List<String>) {
                     }
                 }
             }
-            .min()
+            .minWith(compareBy(Result::gap).thenBy(Result::startIndex))
             ?.endValue
     }
 
@@ -47,8 +47,5 @@ class Day1(lines: List<String>) {
         val gap: Int,
         val startIndex: Int,
         val endValue: Int
-    ) : Comparable<Result> {
-        override fun compareTo(other: Result): Int =
-            gap.compareTo(other.gap).takeIf { it != 0 } ?: startIndex.compareTo(other.startIndex)
-    }
+    )
 }

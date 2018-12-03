@@ -4,9 +4,11 @@ data class IntPair(
     val first: Int,
     val second: Int
 ) : Comparable<IntPair> {
-    override operator fun compareTo(other: IntPair): Int =
-        first.compareTo(other.first).takeIf { it != 0 }
-        ?: second.compareTo(other.second)
+    override operator fun compareTo(other: IntPair): Int = comparator.compare(this, other)
+
+    companion object {
+        private val comparator = compareBy(IntPair::first).thenBy(IntPair::second)
+    }
 }
 
 data class IntPairRange(

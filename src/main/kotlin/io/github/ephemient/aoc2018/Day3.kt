@@ -1,7 +1,7 @@
 package io.github.ephemient.aoc2018
 
 class Day3(lines: List<String>) {
-    private val input: List<Area> = lines.mapNotNull { it.toArea() }
+    private val input: List<Area> = lines.mapNotNull { it.toAreaOrNull() }
 
     fun part1(): Int {
         val cloth = mutableMapOf<Pair<Int, Int>, Int>()
@@ -12,9 +12,7 @@ class Day3(lines: List<String>) {
                     val p = x to y
                     val n = cloth.getOrElse(p) { 0 }
                     cloth[p] = n + 1
-                    if (n == 1) {
-                        overlaps++
-                    }
+                    if (n == 1) overlaps++
                 }
             }
         }
@@ -43,7 +41,7 @@ class Day3(lines: List<String>) {
     companion object {
         private val PATTERN = """#(\d+) @ (\d+),(\d+): (\d+)x(\d+)""".toRegex()
 
-        private fun String.toArea(): Area? {
+        private fun String.toAreaOrNull(): Area? {
             val match = PATTERN.matchEntire(this) ?: return null
             val (sid, sx, sy, sw, sh) = match.destructured
             val id = sid.toInt()
