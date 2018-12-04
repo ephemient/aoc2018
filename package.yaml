@@ -28,6 +28,7 @@ library:
   - array
   - containers
   - megaparsec
+  - time
 
 executables:
   aoc2018-exe:
