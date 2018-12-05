@@ -33,3 +33,8 @@ day4a :: String -> Int
 day4b :: String -> Int
 instance GHC.Classes.Ord id => GHC.Classes.Ord (Day4.Event id)
 instance GHC.Classes.Eq id => GHC.Classes.Eq (Day4.Event id)
+
+
+module Day5
+day5a :: String -> Int
+day5b :: String -> Int
