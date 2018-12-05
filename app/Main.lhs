@@ -68,6 +68,10 @@ import Day3 (day3a, day3b)
 ```haskell
 import Day4 (day4a, day4b)
 ```
+## [Day 5: Alchemical Reaction](/src/Day5.hs)
+```haskell
+import Day5 (day5a, day5b)
+```
 
 ---
 
@@ -105,4 +109,5 @@ main = do
     run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b]
     run 3 getDayInput (putStrLn . maybeBottom show) [day3a, day3b]
     run 4 getDayInput print [day4a, day4b]
+    run 5 getDayInput print [day5a, day5b]
 ```
