@@ -8,12 +8,9 @@ module Day5 (day5a, day5b) where
 import Data.Char (isAlpha, isUpper, toUpper)
 
 react :: String -> Int
-react = react' "" where
-    react' [] (a:as) = react' [a] as
-    react' (b:bs) (a:as)
-      | isUpper a /= isUpper b && toUpper a == toUpper b = react' bs as
-      | otherwise = react' (a:b:bs) as
-    react' remainder [] = length remainder
+react = length . foldr acc ""
+  where acc a (b:bs) | isUpper a /= isUpper b && toUpper a == toUpper b = bs
+        acc a bs = a:bs
 
 day5a :: String -> Int
 day5a = react . filter isAlpha
