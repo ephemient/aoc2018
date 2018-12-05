@@ -21,8 +21,8 @@ data class IntPairRange(
     private val secondRange: IntRange
         get() = start.second..endInclusive.second
 
-    override operator fun contains(value: IntPair): Boolean =
-        value.first in firstRange && value.second in secondRange
+    override operator fun contains(element: IntPair): Boolean =
+        element.first in firstRange && element.second in secondRange
 
     override val size: Int
         get() = firstRange.count() * secondRange.count()
