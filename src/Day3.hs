@@ -12,7 +12,7 @@ import Data.Array.ST (STArray, newArray, readArray, runSTUArray, writeArray)
 import Data.Function (on)
 import Data.IntSet (delete, fromList, minView)
 import Data.List.NonEmpty (nonEmpty)
-import Data.STRef (modifySTRef, newSTRef, readSTRef)
+import Data.STRef (modifySTRef', newSTRef, readSTRef)
 import Data.Semigroup (sconcat)
 import Text.Megaparsec (between, parseMaybe, sepEndBy)
 import Text.Megaparsec.Char (char, newline, space)
@@ -57,7 +57,7 @@ day3b (parse -> Just input@(nonEmpty . map claimArea -> Just (sconcat -> bounds)
     ids <- newSTRef $ fromList $ claimId <$> input
     a <- newSTArray (ix @Int bounds) Nothing
     forM_ input $ \Claim {..} -> forM_ (range $ ix claimArea) $ \i -> readArray a i >>= \case
-        Just claimId' -> modifySTRef ids $ delete claimId' . delete claimId
+        Just claimId' -> modifySTRef' ids $ delete claimId' . delete claimId
         Nothing -> writeArray a i $ Just claimId
     readSTRef ids
   where newSTArray :: (Ix i) => (i, i) -> e -> ST s (STArray s i e)
