@@ -38,3 +38,8 @@ instance GHC.Classes.Eq id => GHC.Classes.Eq (Day4.Event id)
 module Day5
 day5a :: String -> Int
 day5b :: String -> Int
+
+
+module Day6
+day6a :: String -> Int
+day6b :: Int -> String -> Int
