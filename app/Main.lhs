@@ -72,6 +72,10 @@ import Day4 (day4a, day4b)
 ```haskell
 import Day5 (day5a, day5b)
 ```
+## [Day 6: Chronal Coordinates](/src/Day6.hs)
+```haskell
+import Day6 (day6a, day6b)
+```
 
 ---
 
@@ -110,4 +114,5 @@ main = do
     run 3 getDayInput (putStrLn . maybeBottom show) [day3a, day3b]
     run 4 getDayInput print [day4a, day4b]
     run 5 getDayInput print [day5a, day5b]
+    run 6 getDayInput print [day6a, day6b 10000]
 ```
