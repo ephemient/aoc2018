@@ -33,11 +33,13 @@ class Day6(lines: List<String>) {
     fun part1(): Int? {
         val bounds = IntPair(minX, minY)..IntPair(maxX, maxY)
         val field = arrayOfNulls<Pair<Int?, Int>>(bounds.size)
-        for ((n, p) in input.withIndex()) {
-            var distance = 0
-            var q = setOf(IntPair(p.first, p.second))
-            while (q.isNotEmpty()) {
-                q = q.flatMapTo(mutableSetOf<IntPair>()) { p ->
+        val queues = input.map { setOf(IntPair(it.first, it.second)) }.withIndex().toMutableList()
+        var distance = 0
+        while (queues.isNotEmpty()) {
+            val iterator = queues.listIterator()
+            do {
+                val (n, queue) = iterator.next()
+                val next = queue.flatMapTo(mutableSetOf<IntPair>()) { p ->
                     val i = bounds.indexOf(p)
                     when (field[i]?.second?.takeIf { it <= distance }) {
                         null -> {
@@ -51,8 +53,13 @@ class Day6(lines: List<String>) {
                         else -> emptyList()
                     }
                 }
-                distance++
-            }
+                if (next.isEmpty()) {
+                    iterator.remove()
+                } else {
+                    iterator.set(IndexedValue(n, next))
+                }
+            } while (iterator.hasNext())
+            distance++
         }
         val border = (minX..maxX).flatMap { listOf(IntPair(it, minY), IntPair(it, maxY)) } +
             (minY + 1..maxY - 1).flatMap { listOf(IntPair(minX, it), IntPair(maxX, it)) }
