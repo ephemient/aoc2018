@@ -2,7 +2,7 @@
 Module:         Day1
 Description:    <https://adventofcode.com/2018/day/1 Day 1: Chronal Calibration>
 -}
-{-# LANGUAGE TransformListComp #-}
+{-# LANGUAGE TransformListComp, TypeApplications #-}
 module Day1 (day1a, day1b) where
 
 import Control.Applicative ((<|>))
@@ -26,7 +26,7 @@ day1b input = beforeLoop <|> afterLoop
         total = last list
         afterLoop = listToMaybe
           [ endValue
-          | (n, z) <- zip [0 :: Int ..] $ tail list
+          | (n, z) <- zip @Int [0..] $ tail list
           , then group by z `mod` total using groupWith
           , (gap, startIndex, endValue) <-
               [ (abs $ y - x, startIndex, endValue)
