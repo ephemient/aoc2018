@@ -46,7 +46,7 @@ class Day6(lines: List<String>) {
                         }
                         distance -> {
                             field[i] = null to distance
-                            emptyList()
+                            p.neighbors(bounds)
                         }
                         else -> emptyList()
                     }
