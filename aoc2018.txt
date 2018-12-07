@@ -43,3 +43,8 @@ day5b :: String -> Int
 module Day6
 day6a :: String -> Int
 day6b :: Int -> String -> Int
+
+
+module Day7
+day7a :: String -> String
+day7b :: Int -> Int -> String -> Int
