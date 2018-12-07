@@ -76,6 +76,10 @@ import Day5 (day5a, day5b)
 ```haskell
 import Day6 (day6a, day6b)
 ```
+## [Day 7: The Sum of Its Parts](/src/Day7.hs)
+```haskell
+import Day7 (day7a, day7b)
+```
 
 ---
 
@@ -115,4 +119,5 @@ main = do
     run 4 getDayInput print [day4a, day4b]
     run 5 getDayInput print [day5a, day5b]
     run 6 getDayInput print [day6a, day6b 10000]
+    run 7 getDayInput putStrLn [day7a, show . day7b 60 5]
 ```
