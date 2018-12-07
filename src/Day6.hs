@@ -6,15 +6,15 @@ Description:    <https://adventofcode.com/2018/day/6 Day 6: Chronal Coordinates>
 module Day6 (day6a, day6b) where
 
 import Control.Arrow ((&&&), (***))
-import Control.Monad (foldM, unless)
+import Control.Monad (foldM, forM)
 import Data.Array.IArray (assocs)
 import Data.Array.ST (inRange, newArray, readArray, runSTArray, writeArray)
 import Data.Either (partitionEithers)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Map.Strict (elems, fromListWith)
+import Data.Maybe (catMaybes)
 import Data.Semigroup (Max(Max, getMax), Min(Min, getMin), sconcat)
 import Data.Set (empty, fromList, insert, notMember, singleton)
-import qualified Data.Set as Set (null)
 
 parse :: String -> [(Int, Int)]
 parse = map parse1 . lines
@@ -23,13 +23,16 @@ parse = map parse1 . lines
 day6a :: String -> Int
 day6a (parse -> input@(nonEmpty -> Just input')) = postprocess $ runSTArray $ do
     a <- newArray b Nothing
-    let loop n = loop' n (0 :: Int) . singleton
-        loop' n d q = unless (Set.null q) $ foldM (spread n d) empty q >>= loop' n (d + 1)
+    let loop _ [] = return ()
+        loop d queues = loop' d queues >>= loop (d + 1)
+        loop' d queues = fmap catMaybes $ forM queues $ \(n, q) -> do
+            next <- foldM (spread n d) empty q
+            return $ if null next then Nothing else Just (n, next)
         spread n d q p = readArray a p >>= \case
             Just (_, d') | d' < d -> return q
             (fmap snd -> d') -> foldr insert q (neighbors p) <$
                 writeArray a p (Just (if d' == Just d then Nothing else Just n, d))
-    mapM_ (uncurry loop) $ zip @Int [0..] input
+    loop (0 :: Int) $ zip @Int [0..] $ map singleton input
     return a
   where b@((x0, y0), (x1, y1)) = ((getMin *** getMin) *** (getMax *** getMax)) . sconcat $
             ((Min *** Min) &&& (Max *** Max)) <$> input'
