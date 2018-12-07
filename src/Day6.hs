@@ -2,11 +2,11 @@
 Module:         Day6
 Description:    <https://adventofcode.com/2018/day/6 Day 6: Chronal Coordinates>
 -}
-{-# LANGUAGE FlexibleContexts, LambdaCase, TupleSections, ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, TupleSections, TypeApplications, ViewPatterns #-}
 module Day6 (day6a, day6b) where
 
 import Control.Arrow ((&&&), (***))
-import Control.Monad (foldM, unless, when)
+import Control.Monad (foldM, unless)
 import Data.Array.IArray (assocs)
 import Data.Array.ST (inRange, newArray, readArray, runSTArray, writeArray)
 import Data.Either (partitionEithers)
@@ -26,9 +26,10 @@ day6a (parse -> input@(nonEmpty -> Just input')) = postprocess $ runSTArray $ do
     let loop n = loop' n (0 :: Int) . singleton
         loop' n d q = unless (Set.null q) $ foldM (spread n d) empty q >>= loop' n (d + 1)
         spread n d q p = readArray a p >>= \case
-            Just (_, d') | d' <= d -> q <$ when (d' == d) (writeArray a p (Just (Nothing, d)))
-            _ -> foldr insert q (neighbors p) <$ writeArray a p (Just (Just n, d))
-    mapM_ (uncurry loop) $ zip [(0 :: Int)..] input
+            Just (_, d') | d' < d -> return q
+            (fmap snd -> d') -> foldr insert q (neighbors p) <$
+                writeArray a p (Just (if d' == Just d then Nothing else Just n, d))
+    mapM_ (uncurry loop) $ zip @Int [0..] input
     return a
   where b@((x0, y0), (x1, y1)) = ((getMin *** getMin) *** (getMax *** getMax)) . sconcat $
             ((Min *** Min) &&& (Max *** Max)) <$> input'
