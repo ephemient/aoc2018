@@ -29,8 +29,8 @@ instance GHC.Classes.Ord dim => GHC.Base.Semigroup (Day3.Area dim)
 
 
 module Day4
-day4a :: String -> Int
-day4b :: String -> Int
+day4a :: String -> Maybe Int
+day4b :: String -> Maybe Int
 instance GHC.Classes.Ord id => GHC.Classes.Ord (Day4.Event id)
 instance GHC.Classes.Eq id => GHC.Classes.Eq (Day4.Event id)
 
