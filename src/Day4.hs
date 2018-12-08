@@ -40,14 +40,16 @@ countMinutes t0@(todMin . timeToTimeOfDay . utctDayTime -> m0) t1 =
         m1 = (m0 + minutes) `mod` 60
         interval m = (if m0 < m1 then (&&) else (||)) (m0 <= m) (m < m1)
 
-day4a :: String -> Int
-day4a (parseMaybe @() parser -> Just (schedule -> intervals)) = maxOwner * maxMinute
+day4a :: String -> Maybe Int
+day4a (parseMaybe @() parser -> Just (schedule -> intervals)) = Just $ maxOwner * maxMinute
   where (maxOwner, _) = maximumBy (comparing snd) $ assocs $ fromListWith (+)
             [(owner, diffUTCTime t1 t0) | (owner, t0, t1) <- intervals]
         (maxMinute, _) = maximumBy (comparing snd) $ assocs $ unionsWith (+)
             [countMinutes t0 t1 | (owner, t0, t1) <- intervals, owner == maxOwner]
+day4a _ = Nothing
 
-day4b :: String -> Int
-day4b (parseMaybe @() parser -> Just (schedule -> intervals)) = maxOwner * maxMinute
+day4b :: String -> Maybe Int
+day4b (parseMaybe @() parser -> Just (schedule -> intervals)) = Just $ maxOwner * maxMinute
   where ((maxOwner, maxMinute), _) = maximumBy (comparing snd) $ assocs $ unionsWith (+)
             [mapKeysMonotonic (owner,) $ countMinutes t0 t1 | (owner, t0, t1) <- intervals]
+day4b _ = Nothing

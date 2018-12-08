@@ -120,7 +120,7 @@ main = do
     run 1 getDayInput putStrLn [show . day1a, maybeBottom show . day1b]
     run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b]
     run 3 getDayInput (putStrLn . maybeBottom show) [day3a, day3b]
-    run 4 getDayInput print [day4a, day4b]
+    run 4 getDayInput (putStrLn . maybeBottom show) [day4a, day4b]
     run 5 getDayInput print [day5a, day5b]
     run 6 getDayInput print [day6a, day6b 10000]
     run 7 getDayInput putStrLn [day7a, show . day7b 60 5]

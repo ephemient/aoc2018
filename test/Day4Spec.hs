@@ -7,10 +7,10 @@ spec :: Spec
 spec = do
     describe "part 1" $
         it "examples" $
-            day4a sample `shouldBe` 240
+            day4a sample `shouldBe` Just 240
     describe "part 2" $
         it "examples" $
-            day4b sample `shouldBe` 4455
+            day4b sample `shouldBe` Just 4455
   where sample =
             "[1518-11-01 00:00] Guard #10 begins shift\n" ++
             "[1518-11-01 00:05] falls asleep\n" ++
