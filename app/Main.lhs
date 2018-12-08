@@ -80,6 +80,10 @@ import Day6 (day6a, day6b)
 ```haskell
 import Day7 (day7a, day7b)
 ```
+## [Day 8: Memory Maneuver](/src/Day8.hs)
+```haskell
+import Day8 (day8a, day8b)
+```
 
 ---
 
@@ -120,4 +124,5 @@ main = do
     run 5 getDayInput print [day5a, day5b]
     run 6 getDayInput print [day6a, day6b 10000]
     run 7 getDayInput putStrLn [day7a, show . day7b 60 5]
+    run 8 getDayInput (putStrLn . maybeBottom show) [day8a, day8b]
 ```
