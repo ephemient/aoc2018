@@ -20,8 +20,8 @@ parse :: String -> [(Int, Int)]
 parse = map parse1 . lines
   where parse1 s = read $ "(" ++ s ++ ")"
 
-day6a :: String -> Int
-day6a (parse -> input@(nonEmpty -> Just input')) = postprocess $ runSTArray $ do
+day6a :: String -> Maybe Int
+day6a (parse -> input@(nonEmpty -> Just input')) = Just $ postprocess $ runSTArray $ do
     a <- newArray b Nothing
     let loop _ [] = return ()
         loop d queues = loop' d queues >>= loop (d + 1)
@@ -43,10 +43,11 @@ day6a (parse -> input@(nonEmpty -> Just input')) = postprocess $ runSTArray $ do
                   [ (if x == x0 || x == x1 || y == y0 || y == y1 then Right else Left) n
                   | ((x, y), Just (Just n, _)) <- assocs a
                   ]
+day6a _ = Nothing
 
-day6b :: Int -> String -> Int
+day6b :: Int -> String -> Maybe Int
 day6b limit (parse -> input@(unzip -> (xs@(nonEmpty -> Just xs'), ys@(nonEmpty -> Just ys')))) =
-    length $ filter (< limit) [dx + dy | dx <- dxs', dy <- dys']
+    Just $ length $ filter (< limit) [dx + dy | dx <- dxs', dy <- dys']
   where radius = limit `div` length input
         (Min x0, Max x1) = sconcat $ (Min &&& Max) <$> xs'
         (Min y0, Max y1) = sconcat $ (Min &&& Max) <$> ys'
@@ -54,3 +55,4 @@ day6b limit (parse -> input@(unzip -> (xs@(nonEmpty -> Just xs'), ys@(nonEmpty -
         dys = [sum [abs $ y - y'| y' <- ys] | y <- [y0 - radius..y1 + radius]]
         dxs' = filter (< limit - minimum dys) dxs
         dys' = filter (< limit - minimum dxs) dys
+day6b _ _ = Nothing

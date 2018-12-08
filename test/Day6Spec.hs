@@ -7,8 +7,8 @@ spec :: Spec
 spec = do
     describe "part 1" $
         it "examples" $
-            day6a sample `shouldBe` 17
+            day6a sample `shouldBe` Just 17
     describe "part 2" $
         it "examples" $
-            day6b 32 sample `shouldBe` 16
+            day6b 32 sample `shouldBe` Just 16
   where sample = "1, 1\n1, 6\n8, 3\n3, 4\n5, 5\n8, 9"
