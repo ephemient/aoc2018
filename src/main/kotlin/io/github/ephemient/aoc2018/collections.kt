@@ -22,11 +22,10 @@ inline fun <K, V> MutableMap<K, V>.removeFirst(
         val (key, value) = iterator.next()
         if (predicate(key, value)) {
             iterator.remove()
-            return object : Map.Entry<K, V> {
-                override val key = key
-                override val value = value
-            }
+            return SimpleMapEntry<K, V>(key, value)
         }
     }
     return null
 }
+
+data class SimpleMapEntry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V>
