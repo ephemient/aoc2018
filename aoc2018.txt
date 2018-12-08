@@ -48,3 +48,8 @@ day6b :: Int -> String -> Int
 module Day7
 day7a :: String -> String
 day7b :: Int -> Int -> String -> Int
+
+
+module Day8
+day8a :: String -> Maybe Int
+day8b :: String -> Maybe Int
