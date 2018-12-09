@@ -84,6 +84,10 @@ import Day7 (day7a, day7b)
 ```haskell
 import Day8 (day8a, day8b)
 ```
+## [Day 9: Marble Mania](/src/Day9.hs)
+```haskell
+import Day9 (day9a, day9b)
+```
 
 ---
 
@@ -125,4 +129,5 @@ main = do
     run 6 getDayInput (putStrLn . maybeBottom show) [day6a, day6b 10000]
     run 7 getDayInput putStrLn [day7a, show . day7b 60 5]
     run 8 getDayInput (putStrLn . maybeBottom show) [day8a, day8b]
+    run 9 getDayInput (putStrLn . maybeBottom show) [day9a, day9b]
 ```
