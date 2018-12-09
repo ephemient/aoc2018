@@ -14,44 +14,43 @@ class Day9(lines: List<String>) {
 
     fun part2(): Long? = play(players, 100 * target)
 
-    private class Ring<T>(element: T) {
-        private var root = Node(element)
-
-        fun insert(element: T) {
-            root = Node(element, root, root.right)
-        }
-
-        fun delete(): T {
-            require(root.left != root && root.right != root)
-            val element = root.element
-            root.left.right = root.right
-            root.right.left = root.left
-            root = root.right
-            return element
-        }
+    private class IntRing(val capacity: Int, vararg elements: Int) {
+        var size = elements.size.also { require(it <= capacity) }
+            private set
+        private var head = 0
+        private val data = IntArray(capacity).also { elements.copyInto(it) }
 
         fun move(n: Int) {
-            if (n < 0) repeat(-n) { root = root.left } else repeat(n) { root = root.right }
+            if (n < 0) {
+                repeat(-n) {
+                    val prev = Math.floorMod(head - 1, capacity)
+                    val last = Math.floorMod(prev + size, capacity)
+                    data[prev] = data[last]
+                    head = prev
+                }
+            } else {
+                repeat(n) {
+                    val next = Math.floorMod(head + 1, capacity)
+                    val end = Math.floorMod(head + size, capacity)
+                    data[end] = data[head]
+                    head = next
+                }
+            }
         }
 
-        override fun toString(): String = generateSequence(root) { it.right.takeIf { it !== root } }
-            .joinToString(prefix = "[", postfix = "]") { it.element.toString() }
+        fun insert(element: Int) {
+            check(size < capacity)
+            val prev = Math.floorMod(head - 1, capacity)
+            data[prev] = element
+            size++
+            head = prev
+        }
 
-        private class Node<T> {
-            var element: T
-            var left: Node<T>
-            var right: Node<T>
-
-            constructor(element: T) {
-                this.element = element
-                left = this
-                right = this
-            }
-
-            constructor(element: T, left: Node<T>, right: Node<T>) {
-                this.element = element
-                this.left = left.also { it.right = this }
-                this.right = right.also { it.left = this }
+        fun remove(): Int {
+            check(size > 0)
+            return data[head].also {
+                head = Math.floorMod(head + 1, capacity)
+                size--
             }
         }
     }
@@ -61,13 +60,13 @@ class Day9(lines: List<String>) {
 
         fun play(players: Int, target: Int): Long? {
             val scores = mutableMapOf<Int, Long>()
-            val ring = Ring(0)
+            val ring = IntRing(target, 0)
             for (n in 1..target) {
                 if (n % 23 == 0) {
                     ring.move(-7)
-                    scores[n % players] = scores.getOrElse(n % players) { 0L } + ring.delete() + n
+                    scores[n % players] = scores.getOrElse(n % players) { 0L } + ring.remove() + n
                 } else {
-                    ring.move(1)
+                    ring.move(2)
                     ring.insert(n)
                 }
             }
