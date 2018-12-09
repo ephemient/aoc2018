@@ -2,7 +2,7 @@
 Module:         Day9
 Description:    <https://adventofcode.com/2018/day/9 Day 9: Marble Mania>
 -}
-{-# LANGUAGE FlexibleContexts, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, Strict, TypeApplications #-}
 module Day9 (day9a, day9b, play) where
 
 import Control.Arrow (second)
