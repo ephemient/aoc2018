@@ -8,7 +8,8 @@ module Day9 (day9a, day9b, play) where
 import Control.Arrow (second)
 import Control.Monad (foldM, forM_)
 import Control.Monad.ST (ST, runST)
-import Data.Array.ST (STUArray, newArray, readArray, writeArray)
+import Data.Array.Base (newArray, unsafeRead, unsafeWrite)
+import Data.Array.ST (STUArray)
 import Data.IntMap (elems, empty, insertWith)
 import Text.Megaparsec (MonadParsec, parseMaybe, skipManyTill, takeRest)
 import Text.Megaparsec.Char (satisfy)
@@ -23,14 +24,14 @@ play players target = maximum . elems $ runST $ do
     let ix pos i = (pos + i) `mod` target
         acc (pos, size, scores) n
           | n `mod` 23 == 0 = do
-                forM_ [1..6] $ \i -> readArray a (ix pos $ size - i) >>= writeArray a (ix pos (-i))
-                m <- readArray a $ ix pos $ size - 7
+                forM_ [1..6] $ \i -> unsafeRead a (ix pos $ size - i) >>= unsafeWrite a (ix pos (-i))
+                m <- unsafeRead a $ ix pos $ size - 7
                 let scores' = insertWith (+) (n `mod` players) (n + m) scores
                 return (ix pos (-6), size - 1, scores')
           | otherwise = do
-                readArray a pos >>= writeArray a (ix pos size)
-                readArray a (ix pos 1) >>= writeArray a (ix pos $ size + 1)
-                writeArray a (ix pos 1) n
+                unsafeRead a pos >>= unsafeWrite a (ix pos size)
+                unsafeRead a (ix pos 1) >>= unsafeWrite a (ix pos $ size + 1)
+                unsafeWrite a (ix pos 1) n
                 return (ix pos 1, size + 1, scores)
     (_, _, scores) <- foldM acc (0, 1, empty) [1..target]
     return scores
