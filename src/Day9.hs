@@ -23,16 +23,15 @@ singleton :: a -> Zipper a
 singleton here = Zipper {left = [], here, right = []}
 
 moveZipper :: Int -> Zipper a -> Zipper a
-moveZipper 0 zipper = zipper
-moveZipper _ zipper@Zipper {left = [], right = []} = zipper
-moveZipper n zipper@Zipper {..} | n < 0 = case splitAt (-n) left of
-    (reverse -> a:as, bs) ->
-        moveZipper (n + 1 + length as) zipper {left = bs, here = a, right = as ++ (here:right)}
-    ([], _) -> moveZipper n zipper {left = reverse right, right = []}
-moveZipper n zipper@Zipper {..} | n > 0 = case splitAt n right of
-    (reverse -> a:as, bs) ->
-        moveZipper (n - 1 - length as) zipper {left = as ++ (here:left), here = a, right = bs}
-    ([], _) -> moveZipper n zipper {left = [], right = reverse left}
+moveZipper n zipper@Zipper {..} = case compare n 0 of
+    EQ -> zipper
+    _  | [] <- left, [] <- right -> zipper
+    LT | (reverse -> a:as, bs) <- splitAt (-n) left ->
+         moveZipper (n + 1 + length as) zipper {left = bs, here = a, right = as ++ (here:right)}
+       | otherwise -> moveZipper n zipper {left = reverse right, right = []}
+    GT | (reverse -> a:as, bs) <- splitAt n right ->
+         moveZipper (n - 1 - length as) zipper {left = as ++ (here:left), here = a, right = bs}
+       | otherwise -> moveZipper n zipper {left = [], right = reverse left}
 
 insertZipper :: a -> Zipper a -> Zipper a
 insertZipper a zipper@Zipper {..} = zipper {left = here:left, here = a}
