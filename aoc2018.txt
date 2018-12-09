@@ -53,3 +53,9 @@ day7b :: Int -> Int -> String -> Int
 module Day8
 day8a :: String -> Maybe Int
 day8b :: String -> Maybe Int
+
+
+module Day9
+day9a :: String -> Maybe Int
+day9b :: String -> Maybe Int
+play :: Int -> Int -> Int
