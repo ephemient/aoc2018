@@ -2,35 +2,57 @@
 Module:         Day9
 Description:    <https://adventofcode.com/2018/day/9 Day 9: Marble Mania>
 -}
-{-# LANGUAGE FlexibleContexts, RecordWildCards, StrictData, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, NamedFieldPuns, PatternGuards, RecordWildCards, StrictData, TypeApplications, ViewPatterns #-}
 module Day9 (day9a, day9b, play) where
 
 import Control.Arrow (second)
 import Data.IntMap (IntMap, elems, empty, insertWith)
 import Data.List (foldl')
-import Data.Sequence (Seq, deleteAt, index, insertAt, length, singleton)
-import Prelude hiding (length)
 import Text.Megaparsec (MonadParsec, parseMaybe, skipManyTill, takeRest)
 import Text.Megaparsec.Char (satisfy)
 import Text.Megaparsec.Char.Lexer (decimal)
 
-data Game a = Game {scores :: IntMap a, pos :: Int, ring :: Seq a}
+data Zipper a = Zipper {left :: [a], here :: a, right :: [a]}
+
+data Game a = Game {scores :: IntMap a, ring :: Zipper a}
 
 parser :: (MonadParsec e String m, Integral players, Integral target) => m (players, target)
 parser = (,) <$> decimal <*> skipManyTill (satisfy $ const True) decimal <* takeRest
 
+singleton :: a -> Zipper a
+singleton here = Zipper {left = [], here, right = []}
+
+moveZipper :: Int -> Zipper a -> Zipper a
+moveZipper 0 zipper = zipper
+moveZipper _ zipper@Zipper {left = [], right = []} = zipper
+moveZipper n zipper@Zipper {..} | n < 0 = case splitAt (-n) left of
+    (reverse -> a:as, bs) ->
+        moveZipper (n + 1 + length as) zipper {left = bs, here = a, right = as ++ (here:right)}
+    ([], _) -> moveZipper n zipper {left = reverse right, right = []}
+moveZipper n zipper@Zipper {..} | n > 0 = case splitAt n right of
+    (reverse -> a:as, bs) ->
+        moveZipper (n - 1 - length as) zipper {left = as ++ (here:left), here = a, right = bs}
+    ([], _) -> moveZipper n zipper {left = [], right = reverse left}
+
+insertZipper :: a -> Zipper a -> Zipper a
+insertZipper a zipper@Zipper {..} = zipper {left = here:left, here = a}
+
+removeZipper :: Zipper a -> (a, Zipper a)
+removeZipper Zipper {left = [], right = []} = error "empty"
+removeZipper zipper@Zipper {..} = case right of
+    a:as -> (here, zipper {here = a, right = as})
+    [] -> removeZipper zipper {left = [], right = reverse left}
+
 play :: Int -> Int -> Int
 play players target = maximum . elems . scores $
-    foldl' acc Game {scores = empty, pos = 0, ring = singleton 0} [1..target]
+    foldl' acc Game {scores = empty, ring = singleton 0} [1..target]
   where acc game@Game {..} n
           | n `mod` 23 == 0
-          = let scores' = insertWith (+) (n `mod` players) (n + index ring pos') scores
-                pos' = (pos - 7) `mod` length ring
-                ring' = deleteAt pos' ring
-            in game {scores = scores', pos = pos', ring = ring'}
+          = let scores' = insertWith (+) (n `mod` players) (n + m) scores
+                (m, ring') = removeZipper $ moveZipper (-7) ring
+            in game {scores = scores', ring = ring'}
           | otherwise
-          = let pos' = (pos + 1) `mod` length ring + 1
-            in game {pos = pos', ring = insertAt pos' n ring}
+          = game {ring = insertZipper n $ moveZipper 1 ring}
 
 day9a :: String -> Maybe Int
 day9a = fmap (uncurry play) . parseMaybe @() parser
