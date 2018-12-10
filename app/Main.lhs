@@ -88,6 +88,10 @@ import Day8 (day8a, day8b)
 ```haskell
 import Day9 (day9a, day9b)
 ```
+## [Day 10: The Stars Align](/src/Day10.hs)
+```haskell
+import Day10 (day10)
+```
 
 ---
 
@@ -130,4 +134,5 @@ main = do
     run 7 getDayInput putStrLn [day7a, show . day7b 60 5]
     run 8 getDayInput (putStrLn . maybeBottom show) [day8a, day8b]
     run 9 getDayInput (putStrLn . maybeBottom show) [day9a, day9b]
+    run 10 getDayInput (putStrLn . maybeBottom (\(i, s) -> s ++ show i)) [day10]
 ```
