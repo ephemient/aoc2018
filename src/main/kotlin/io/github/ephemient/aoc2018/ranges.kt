@@ -27,6 +27,9 @@ data class IntPairRange(
     override val size: Int
         get() = firstRange.count() * secondRange.count()
 
+    val sizeAsLong: Long
+        get() = firstRange.count().toLong() * secondRange.count().toLong()
+
     override operator fun get(index: Int): IntPair {
         if (index !in indices) throw IndexOutOfBoundsException()
         val stride = secondRange.count()
