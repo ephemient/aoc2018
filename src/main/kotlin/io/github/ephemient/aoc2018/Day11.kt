@@ -9,14 +9,11 @@ class Day11(lines: List<String>, private val size: Int = 300) {
         }
     }
 
-    fun part1(): String {
-        val (y, x) = (IntPair(0, 0)..IntPair(size - 3, size - 3)).maxBy { (y, x) ->
-            table[y + 3][x + 3] - table[y][x + 3] - table[y + 3][x] + table[y][x]
-        }!!
-        return "${x + 1},${y + 1}"
-    }
+    fun part1(): String? = (IntPair(0, 0)..IntPair(size - 3, size - 3)).maxBy { (y, x) ->
+        table[y + 3][x + 3] - table[y][x + 3] - table[y + 3][x] + table[y][x]
+    }?.let { (y, x) -> "${x + 1},${y + 1}" }
 
-    fun part2(): String {
+    fun part2(): String? {
         var bestPoint: Triple<Int, Int, Int>? = null
         var maxValue: Int? = null
         for ((y, x) in IntPair(0, 0)..IntPair(size - 1, size - 1)) {
@@ -28,7 +25,6 @@ class Day11(lines: List<String>, private val size: Int = 300) {
                 }
             }
         }
-        val (x, y, n) = bestPoint!!
-        return "${x + 1},${y + 1},$n"
+        return bestPoint?.let { (x, y, n) -> "${x + 1},${y + 1},$n" }
     }
 }

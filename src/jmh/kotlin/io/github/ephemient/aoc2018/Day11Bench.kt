@@ -15,8 +15,8 @@ open class Day11Bench {
     }
 
     @Benchmark
-    fun part1(): String = Day11(lines).part1()
+    fun part1(): String? = Day11(lines).part1()
 
     @Benchmark
-    fun part2(): String = Day11(lines).part2()
+    fun part2(): String? = Day11(lines).part2()
 }
