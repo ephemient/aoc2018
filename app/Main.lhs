@@ -92,6 +92,10 @@ import Day9 (day9a, day9b)
 ```haskell
 import Day10 (day10)
 ```
+## [Day 11: Chronal Charge](/src/Day11.hs)
+```haskell
+import Day11 (day11a, day11b)
+```
 
 ---
 
@@ -135,4 +139,5 @@ main = do
     run 8 getDayInput (putStrLn . maybeBottom show) [day8a, day8b]
     run 9 getDayInput (putStrLn . maybeBottom show) [day9a, day9b]
     run 10 getDayInput (putStrLn . maybeBottom (\(i, s) -> s ++ show i)) [day10]
+    run 11 getDayInput putStrLn [day11a, day11b]
 ```
