@@ -2,41 +2,39 @@
 Module:         Day11
 Description:    <https://adventofcode.com/2018/day/11 Day 11: Chronal Charge>
 -}
-{-# LANGUAGE FlexibleContexts, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE TypeApplications, ViewPatterns #-}
 module Day11 (day11a, day11b) where
 
-import Control.Arrow ((***), second)
-import Data.Array.Unboxed (UArray, (!), assocs, bounds, listArray, range, rangeSize)
 import Data.Char (isDigit)
-import Data.List (maximumBy, unfoldr)
+import Data.Function (on)
+import Data.List (maximumBy, scanl', tails)
 import Data.Ord (comparing)
 
-dimens :: ((Int, Int), (Int, Int))
-dimens = ((1, 1), (300, 300))
+size :: Int
+size = 300
 
-power :: (Integral a) => a -> (a, a) -> a
-power z (x, y) = let r = x + 10 in ((r * y + z) * r) `div` 100 `mod` 10 - 5
+tabulate :: (Integral a) => a -> [[a]]
+tabulate z = scanl build (repeat 0) [1..]
+  where build prev y = zipWith (+) prev $ scanl' (acc y) 0 [1..]
+        acc y prev x = prev + let r = x + 10 in ((r * y + z) * r) `div` 100 `mod` 10 - 5
 
 day11a :: String -> String
-day11a (read . filter isDigit -> z) = show maxX ++ "," ++ show maxY
-  where table = listArray dimens $ power z <$> range dimens :: UArray (Int, Int) Int
-        ((maxX, maxY), _) = maximumBy (comparing snd)
-          [ (p, sum [table ! q | q <- range ((x, y), (x + 2, y + 2))])
-          | p@(x, y) <- range ((1, 1), (298, 298))
+day11a (tabulate . read @Int . filter isDigit -> table) = show maxX ++ "," ++ show maxY
+  where ((maxX, maxY), _) = maximumBy (comparing snd)
+          [ ((x, y), a - b - c + d)
+          | (y, row:_:_:row':_) <- zip [1..size - 2] $ tails table
+          , (x, a:_:_:b:_, c:_:_:d:_) <- (zip3 [1..size - 2] `on` tails) row row'
           ]
 
 day11b :: String -> String
-day11b (read . filter isDigit -> z) = show maxX ++ "," ++ show maxY ++ "," ++ show @Int maxN
-  where table = listArray dimens $ power z <$> range dimens :: UArray (Int, Int) Int
-        (maxN, ((maxX, maxY), _)) = maximumBy (comparing $ snd . snd) $ zip [1..] $
-            maximumBy (comparing snd) . assocs <$> table : unfoldr grow (1, table)
-        grow (n, prev)
-          | rangeSize dimens' <= 0 = Nothing
-          | otherwise = Just (next, (n + 1, next))
-          where dimens' = second (pred *** pred) $ bounds prev
-                next = listArray dimens'
-                  [ prev ! p +
-                        sum [table ! (x + n, y + i) | i <- [0..n - 1]] +
-                        sum [table ! (x + i, y + n) | i <- [0..n]]
-                  | p@(x, y) <- range dimens'
-                  ]
+day11b (tabulate . read @Int . filter isDigit -> table) =
+    show maxX ++ "," ++ show maxY ++ "," ++ show maxN
+  where ((maxX, maxY, maxN), _) = maximumBy (comparing snd)
+          [ ((x, y, z + 1), a - b - c + d)
+          | (y, row:table') <- zip [1..size] $ tails table
+          , (x, a:row') <- zip [1..size] $ tails row
+          , z <- [0..size - max x y]
+          , let b = row' !! z
+                c:row'' = drop (x - 1) $ table' !! z
+                d = row'' !! z
+          ]
