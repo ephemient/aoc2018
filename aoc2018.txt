@@ -21,6 +21,11 @@ module Day10
 day10 :: String -> Maybe (Int, String)
 
 
+module Day11
+day11a :: String -> String
+day11b :: String -> String
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
