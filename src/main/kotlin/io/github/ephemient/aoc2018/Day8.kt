@@ -1,7 +1,7 @@
 package io.github.ephemient.aoc2018
 
 class Day8(lines: List<String>) {
-    private val input: IntArray = lines.first()
+    private val input: IntArray = lines.single()
         .split(' ')
         .mapNotNull { it.toIntOrNull() }
         .toIntArray()

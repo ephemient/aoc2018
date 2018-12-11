@@ -2,7 +2,7 @@ package io.github.ephemient.aoc2018
 
 class Day11(lines: List<String>, private val size: Int = 300) {
     private val table = Array(size + 1) { IntArray(size + 1) }.also { table ->
-        val serial = lines.first().toInt()
+        val serial = lines.single().toInt()
         for ((y, x) in IntPair(1, 1)..IntPair(size, size)) {
             table[y][x] = table[y - 1][x] + table[y][x - 1] - table[y - 1][x - 1] +
                 ((x + 10) * y + serial) * (x + 10) / 100 % 10 - 5

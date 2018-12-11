@@ -1,7 +1,7 @@
 package io.github.ephemient.aoc2018
 
 class Day5(lines: List<String>) {
-    private val input = lines.first()
+    private val input = lines.single()
 
     fun part1(): Int = react(input).length
 

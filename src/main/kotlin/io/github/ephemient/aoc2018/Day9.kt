@@ -5,7 +5,7 @@ class Day9(lines: List<String>) {
     private val target: Int
 
     init {
-        val (players, target) = requireNotNull(PATTERN.matchEntire(lines.first())).destructured
+        val (players, target) = requireNotNull(PATTERN.matchEntire(lines.single())).destructured
         this.players = players.toInt()
         this.target = target.toInt()
     }
