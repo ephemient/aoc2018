@@ -96,6 +96,10 @@ import Day10 (day10)
 ```haskell
 import Day11 (day11a, day11b)
 ```
+## [Day 12: Subterranean Sustainability](/src/Day12.hs)
+```haskell
+import Day12 (day12)
+```
 
 ---
 
@@ -103,7 +107,7 @@ import Day11 (day11a, day11b)
 import Control.Monad (when)
 import Data.Maybe (mapMaybe)
 import Paths_aoc2018 (getDataFileName)
-import System.Environment (getArgs)
+import System.Environment (getArgs, lookupEnv)
 import Text.Read (readMaybe)
 
 getDayInput :: Int -> IO String
@@ -129,6 +133,7 @@ run day readIO showIO funcs = do
 
 main :: IO ()
 main = do
+    ci <- maybe False (not . null) <$> lookupEnv "CI"
     run 1 getDayInput putStrLn [show . day1a, maybeBottom show . day1b]
     run 2 getDayInput putStrLn [show . day2a, maybeBottom id . day2b]
     run 3 getDayInput (putStrLn . maybeBottom show) [day3a, day3b]
@@ -140,4 +145,5 @@ main = do
     run 9 getDayInput (putStrLn . maybeBottom show) [day9a, day9b]
     run 10 getDayInput (putStrLn . maybeBottom (\(i, s) -> s ++ show i)) [day10]
     run 11 getDayInput putStrLn [day11a, day11b]
+    run 12 getDayInput print $ day12 20 : [day12 50000000000 | not ci]
 ```
