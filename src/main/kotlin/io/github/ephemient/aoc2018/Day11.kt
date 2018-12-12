@@ -9,22 +9,19 @@ class Day11(lines: List<String>, private val size: Int = 300) {
         }
     }
 
-    fun part1(): String? = (IntPair(0, 0)..IntPair(size - 3, size - 3)).maxBy { (y, x) ->
-        table[y + 3][x + 3] - table[y][x + 3] - table[y + 3][x] + table[y][x]
-    }?.let { (y, x) -> "${x + 1},${y + 1}" }
+    private fun box(x: Int, y: Int, n: Int): Int =
+        table[y + n][x + n] - table[y][x + n] - table[y + n][x] + table[y][x]
 
-    fun part2(): String? {
-        var bestPoint: Triple<Int, Int, Int>? = null
-        var maxValue: Int? = null
-        for ((y, x) in IntPair(0, 0)..IntPair(size - 1, size - 1)) {
-            for (n in 1 until size - maxOf(x, y)) {
-                val value = table[y + n][x + n] - table[y][x + n] - table[y + n][x] + table[y][x]
-                if (maxValue == null || maxValue < value) {
-                    bestPoint = Triple(x, y, n)
-                    maxValue = value
-                }
-            }
-        }
-        return bestPoint?.let { (x, y, n) -> "${x + 1},${y + 1},$n" }
+    private fun maxBox(n: Int): Pair<Triple<Int, Int, Int>, Int>? {
+        val (y, x) = (IntPair(0, 0)..IntPair(size - n, size - n)).maxBy { (y, x) -> box(x, y, n) }
+            ?: return null
+        return Triple(x + 1, y + 1, n) to box(x, y, n)
     }
+
+    fun part1(): String? = maxBox(3)?.first?.let { (x, y, _) -> "$x,$y" }
+
+    fun part2(): String? = List(size) { maxBox(it + 1) }
+        .maxWith(nullsFirst(compareBy { it.second }))
+        ?.first
+        ?.let { (x, y, n) -> "$x,$y,$n" }
 }
