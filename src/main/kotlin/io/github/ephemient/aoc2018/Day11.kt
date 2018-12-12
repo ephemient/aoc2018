@@ -1,5 +1,7 @@
 package io.github.ephemient.aoc2018
 
+import kotlin.streams.toList
+
 class Day11(lines: List<String>, private val size: Int = 300) {
     private val table = Array(size + 1) { IntArray(size + 1) }.also { table ->
         val serial = lines.single().toInt()
@@ -20,7 +22,10 @@ class Day11(lines: List<String>, private val size: Int = 300) {
 
     fun part1(): String? = maxBox(3)?.first?.let { (x, y, _) -> "$x,$y" }
 
-    fun part2(): String? = List(size) { maxBox(it + 1) }
+    fun part2(): String? = (1..size).toList()
+        .parallelStream()
+        .map { maxBox(it) }
+        .toList()
         .maxWith(nullsFirst(compareBy { it.second }))
         ?.first
         ?.let { (x, y, n) -> "$x,$y,$n" }
