@@ -26,6 +26,10 @@ day11a :: String -> String
 day11b :: String -> String
 
 
+module Day12
+day12 :: Int -> String -> Int
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
