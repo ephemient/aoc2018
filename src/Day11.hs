@@ -5,7 +5,9 @@ Description:    <https://adventofcode.com/2018/day/11 Day 11: Chronal Charge>
 {-# LANGUAGE TypeApplications, ViewPatterns #-}
 module Day11 (day11a, day11b) where
 
-import Data.Array.Unboxed (IArray, Ix, UArray, (!), listArray, range)
+import Control.Arrow ((***), second)
+import Control.Parallel.Strategies (parMap, rpar)
+import Data.Array.Unboxed (IArray, Ix, UArray, (!), bounds, listArray, range)
 import Data.Char (isDigit)
 import Data.List (maximumBy, scanl')
 import Data.Ord (comparing)
@@ -18,19 +20,16 @@ tabulate z = listArray ((0, 0), (size, size)) $ scanl build (repeat 0) [1..] >>=
   where build prev y = zipWith (+) prev $ scanl' (acc y) 0 [1..]
         acc y prev x = prev + let r = x + 10 in ((r * y + z) * r) `div` 100 `mod` 10 - 5
 
-box :: (IArray a e, Num e, Ix i, Num i) => a (i, i) e -> (i, i) -> i -> e
-box a (y, x) n = a ! (y, x) - a ! (y, x + n) - a ! (y + n, x) + a ! (y + n, x + n)
+maxBox :: (IArray a e, Num e, Ord e, Ix i, Num i) => a (i, i) e -> i -> ((i, i, i), e)
+maxBox a n = maximumBy (comparing snd)
+    [((x + 1, y + 1, n), box p) | p@(y, x) <- range $ second (subtract n *** subtract n) $ bounds a]
+  where box (y, x) = a ! (y, x) - a ! (y, x + n) - a ! (y + n, x) + a ! (y + n, x + n)
 
 day11a :: String -> String
-day11a (tabulate @UArray @Int . read . filter isDigit -> table) = show maxX ++ "," ++ show maxY
-  where ((maxX, maxY), _) = maximumBy (comparing snd)
-            [((x + 1, y + 1), box table p 3) | p@(y, x) <- range ((0, 0), (size - 3, size - 3))]
+day11a (tabulate @UArray @Int . read . filter isDigit -> table) = show x ++ "," ++ show y
+  where ((x, y, _), _) = maxBox table 3
 
 day11b :: String -> String
 day11b (tabulate @UArray @Int . read . filter isDigit -> table) =
-    show maxX ++ "," ++ show maxY ++ "," ++ show maxN
-  where ((maxX, maxY, maxN), _) = maximumBy (comparing snd)
-          [ ((x + 1, y + 1, n), box table p n)
-          | p@(y, x) <- range ((0, 0), (size - 1, size - 1))
-          , n <- [1..size - max x y]
-          ]
+    show x ++ "," ++ show y ++ "," ++ show n
+  where ((x, y, n), _) = maximumBy (comparing snd) $ parMap rpar (maxBox table) [1..size]

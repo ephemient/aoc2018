@@ -28,6 +28,7 @@ library:
   - array
   - containers
   - megaparsec
+  - parallel
   - split
   - time
 
