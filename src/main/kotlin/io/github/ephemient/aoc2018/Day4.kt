@@ -11,7 +11,13 @@ import java.time.temporal.TemporalField
 class Day4(lines: List<String>) {
     private val input: List<Pair<LocalDateTime, Event>> =
         lines.mapNotNull { it.toTimedEventOrNull() }.sortedWith(
-            compareBy(Pair<LocalDateTime, Event>::first).thenBy(Pair<LocalDateTime, Event>::second)
+            compareBy(Pair<LocalDateTime, Event>::first).thenBy { (_, event) ->
+                when (event) {
+                    is Event.Owner -> 0
+                    is Event.Start -> 1
+                    is Event.End -> 2
+                }
+            }
         )
 
     private val schedule: List<Triple<Int, LocalDateTime, LocalDateTime>> =
@@ -40,9 +46,7 @@ class Day4(lines: List<String>) {
 
     fun part1(): Long? {
         val (maxOwner) = schedule.groupingBy { it.first }
-            .fold(0L) { acc, (_, t0, t1) ->
-                acc + ChronoUnit.MINUTES.between(t0, t1)
-            }
+            .fold(0L) { acc, (_, t0, t1) -> acc + ChronoUnit.MINUTES.between(t0, t1) }
             .maxBy { it.value } ?: return null
         val minutes = mutableMapOf<Long, Long>()
         for ((owner, t0, t1) in schedule) {
@@ -69,19 +73,10 @@ class Day4(lines: List<String>) {
         return maxOwner * maxMinute
     }
 
-    private sealed class Event : Comparable<Event> {
+    private sealed class Event {
         data class Owner(val owner: Int) : Event()
         object Start : Event()
         object End : Event()
-
-        override fun compareTo(other: Event): Int = when {
-            this is Owner && other is Owner -> owner.compareTo(other.owner)
-            this is Start && other is Start -> 0
-            this is End && other is End -> 0
-            this is Start -> -1
-            other is Start -> 1
-            else -> 0
-        }
     }
 
     companion object {

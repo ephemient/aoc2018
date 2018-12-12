@@ -5,8 +5,7 @@ class Day10(lines: List<String>) {
     private val _part2: Int
 
     init {
-        val points = lines
-            .also { require(it.isNotEmpty()) }
+        val points = lines.also { require(it.isNotEmpty()) }
             .map { line ->
                 val (x, y, dx, dy) = requireNotNull(PATTERN.matchEntire(line)).destructured
                 Point(x.toInt(), y.toInt(), dx.toInt(), dy.toInt())

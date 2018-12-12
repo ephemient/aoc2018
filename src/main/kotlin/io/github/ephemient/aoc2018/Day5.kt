@@ -10,8 +10,6 @@ class Day5(lines: List<String>) {
         return ('A'..'Z').map { react(prepared, it).length }.min()
     }
 
-    private val buffer = CharArray(input.length)
-
     companion object {
         private fun react(input: String, exclude: Char? = null): String {
             val buffer = CharArray(input.length)

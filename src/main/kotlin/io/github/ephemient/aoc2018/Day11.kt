@@ -11,14 +11,11 @@ class Day11(lines: List<String>, private val size: Int = 300) {
         }
     }
 
-    private fun box(x: Int, y: Int, n: Int): Int =
-        table[y + n][x + n] - table[y][x + n] - table[y + n][x] + table[y][x]
-
-    private fun maxBox(n: Int): Pair<Triple<Int, Int, Int>, Int>? {
-        val (y, x) = (IntPair(0, 0)..IntPair(size - n, size - n)).maxBy { (y, x) -> box(x, y, n) }
-            ?: return null
-        return Triple(x + 1, y + 1, n) to box(x, y, n)
-    }
+    private fun maxBox(n: Int): Pair<Triple<Int, Int, Int>, Int>? =
+        (IntPair(0, 0)..IntPair(size - n, size - n)).map { (y, x) ->
+            Triple(x + 1, y + 1, n) to
+                table[y + n][x + n] - table[y][x + n] - table[y + n][x] + table[y][x]
+        }.maxBy { it.second }
 
     fun part1(): String? = maxBox(3)?.first?.let { (x, y, _) -> "$x,$y" }
 

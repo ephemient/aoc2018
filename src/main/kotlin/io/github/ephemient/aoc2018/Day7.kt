@@ -15,19 +15,18 @@ class Day7(lines: List<String>) {
     fun part1(): String {
         val deps = mutableDependencies
         val sb = StringBuilder(deps.size)
-        while (true) {
-            val (k) = deps.removeFirst { _, value -> value.isEmpty() } ?: break
+        while (deps.isNotEmpty()) {
+            val (k) = checkNotNull(deps.removeFirst { _, value -> value.isEmpty() })
             deps.values.forEach { it.remove(k) }
             sb.append(k)
         }
-        check(deps.isEmpty())
         return sb.toString()
     }
 
     fun part2(cost: Int = 60, workers: Int = 5): Int {
         val deps = mutableDependencies
         val working = sortedSetOf(
-            comparator = compareBy(Pair<Int, Char>::first).thenBy(Pair<Int, Char>::second)
+            comparator = compareBy<Pair<Int, Char>> { it.first }.thenBy { it.second }
         )
         var time = 0
         do {
@@ -36,10 +35,10 @@ class Day7(lines: List<String>) {
                 deps.remove(k)
                 deps.values.forEach { it.remove(k) }
             }
-            while (working.size < workers) {
+            do {
                 val (k) = deps.removeFirst { _, value -> value.isEmpty() } ?: break
                 working.add(time + cost + k.toInt() - 'A'.toInt() + 1 to k)
-            }
+            } while (working.size < workers)
         } while (working.isNotEmpty())
         check(deps.isEmpty())
         return time

@@ -10,11 +10,7 @@ class Day1(lines: List<String>) {
     fun part2(): Int? {
         val seen = mutableSetOf<Int>()
         val list = input.accumulate(0) { a, b -> a + b }
-            .onEach {
-                if (!seen.add(it)) {
-                    return it
-                }
-            }
+            .onEach { if (!seen.add(it)) return it }
             .drop(1)
             .toList()
         val total = list.last()
@@ -26,14 +22,10 @@ class Day1(lines: List<String>) {
                     (n + 1..group.lastIndex).map { m ->
                         val (i, x) = ix
                         val (j, y) = group[m]
-                        val startIndex: Int
-                        val endValue: Int
-                        if ((total < 0) == (x < y)) {
-                            startIndex = j
-                            endValue = x
+                        val (startIndex, endValue) = if ((total < 0) == (x < y)) {
+                            Pair(j, x)
                         } else {
-                            startIndex = i
-                            endValue = y
+                            Pair(i, y)
                         }
                         Result(abs(x - y), startIndex, endValue)
                     }
