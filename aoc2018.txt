@@ -27,7 +27,7 @@ day11b :: String -> String
 
 
 module Day12
-day12 :: Int -> String -> Int
+day12 :: Int -> String -> Maybe Int
 
 
 module Day2
