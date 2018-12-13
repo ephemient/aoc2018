@@ -30,6 +30,11 @@ module Day12
 day12 :: Int -> String -> Maybe Int
 
 
+module Day13
+day13a :: String -> String
+day13b :: String -> String
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
