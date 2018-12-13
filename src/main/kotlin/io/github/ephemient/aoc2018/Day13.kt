@@ -25,53 +25,46 @@ class Day13(lines: List<String>) {
     }
 
     fun part1(): String {
-        var carts = initialCarts
-        while (true) {
-            carts = step(carts) { (y, x) -> return "$x,$y" }
-        }
-    }
-
-    fun part2(): String {
-        var carts = initialCarts
-        while (carts.size > 1) {
-            carts = step(carts) {}
-        }
-        val (y, x) = carts.keys.single()
+        val (y, x) = sequence<IntPair> { run() }.first()
         return "$x,$y"
     }
 
-    private inline fun step(
-        carts: Map<IntPair, Cart>,
-        collision: (IntPair) -> Unit
-    ): Map<IntPair, Cart> {
-        val movedCarts = sortedMapOf<IntPair, Cart>()
-        val cartsToMove = carts.toSortedMap()
-        while (cartsToMove.isNotEmpty()) {
-            var pos = cartsToMove.firstKey()
-            var cart = checkNotNull(cartsToMove.remove(pos))
-            pos = pos.move(cart.orientation)
-            if (pos in movedCarts || pos in cartsToMove) {
-                collision(pos)
-                movedCarts.remove(pos)
-                cartsToMove.remove(pos)
-                continue
+    fun part2(): String {
+        val (y, x) = sequence<IntPair> { run() }.last()
+        return "$x,$y"
+    }
+
+    private suspend fun SequenceScope<IntPair>.run() {
+        var carts = initialCarts.toSortedMap()
+        while (carts.size > 1) {
+            val queue = carts
+            carts = sortedMapOf<IntPair, Cart>()
+            while (queue.isNotEmpty()) {
+                var (pos, cart) = with(queue.entries.iterator()) { next().also { remove() } }
+                pos = pos.move(cart.orientation)
+                if (pos in carts || pos in queue) {
+                    yield(pos)
+                    carts.remove(pos)
+                    queue.remove(pos)
+                    continue
+                }
+                cart = when (crossings[pos]) {
+                    Crossing.Reflect -> cart.copy(orientation = cart.orientation.swapNESW)
+                    Crossing.RReflect -> cart.copy(orientation = cart.orientation.swapNWSE)
+                    Crossing.Plus -> cart.copy(
+                        orientation = when (cart.crossings % 3) {
+                            0 -> cart.orientation.left
+                            2 -> cart.orientation.right
+                            else -> cart.orientation
+                        },
+                        crossings = cart.crossings + 1
+                    )
+                    else -> cart
+                }
+                carts[pos] = cart
             }
-            cart = when (crossings[pos]) {
-                Crossing.Reflect -> cart.copy(orientation = cart.orientation.swapNESW)
-                Crossing.RReflect -> cart.copy(orientation = cart.orientation.swapNWSE)
-                Crossing.Plus -> cart.copy(
-                    orientation = when (cart.crossings % 3) {
-                        0 -> cart.orientation.left
-                        2 -> cart.orientation.right
-                        else -> cart.orientation
-                    },
-                    crossings = cart.crossings + 1
-                )
-                else -> cart
-            }
-            movedCarts[pos] = cart
         }
-        return movedCarts
+        carts.keys.singleOrNull()?.let { yield(it) }
     }
 
     private data class Cart(val orientation: Orientation, val crossings: Int)
