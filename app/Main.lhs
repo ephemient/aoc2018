@@ -100,6 +100,10 @@ import Day11 (day11a, day11b)
 ```haskell
 import Day12 (day12)
 ```
+## [Day 13: Mine Cart Madness](/src/Day13.hs)
+```haskell
+import Day13 (day13a, day13b)
+```
 
 ---
 
@@ -145,4 +149,5 @@ main = do
     run 10 getDayInput (putStrLn . maybeBottom (\(i, s) -> s ++ show i)) [day10]
     run 11 getDayInput putStrLn [day11a, day11b]
     run 12 getDayInput (putStrLn . maybeBottom show) [day12 20, day12 50000000000]
+    run 13 getDayInput putStrLn [day13a, day13b]
 ```
