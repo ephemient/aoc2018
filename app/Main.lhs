@@ -104,6 +104,10 @@ import Day12 (day12)
 ```haskell
 import Day13 (day13a, day13b)
 ```
+## [Day 14: Chocolate Charts](/src/Day14.hs)
+```haskell
+import Day14 (day14a, day14b)
+```
 
 ---
 
@@ -150,4 +154,5 @@ main = do
     run 11 getDayInput putStrLn [day11a, day11b]
     run 12 getDayInput (putStrLn . maybeBottom show) [day12 20, day12 50000000000]
     run 13 getDayInput putStrLn [day13a, day13b]
+    run 14 getDayInput putStrLn [day14a, show . day14b]
 ```
