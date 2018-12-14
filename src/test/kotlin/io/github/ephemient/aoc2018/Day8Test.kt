@@ -14,6 +14,16 @@ class Day8Test {
         assertEquals(66, Day8(lines).part2())
     }
 
+    @Test
+    fun `part 1 examples (Scala)`() {
+        assertEquals(138, Day8s(lines).part1())
+    }
+
+    @Test
+    fun `part 2 examples (Scala)`() {
+        assertEquals(66, Day8s(lines).part2())
+    }
+
     companion object {
         private val lines = listOf("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2")
     }

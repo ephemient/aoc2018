@@ -1,6 +1,7 @@
 plugins {
     id("org.jetbrains.dokka") version "0.9.17"
     kotlin("jvm") version "1.3.10"
+    `scala`
     id("org.jmailen.kotlinter") version "1.20.1"
     application
     id("me.champeau.gradle.jmh") version "0.4.7"
@@ -20,6 +21,7 @@ defaultTasks = listOf("test", "run")
 dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.scala-lang:scala-library:2.12.8")
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.2")
     jmhImplementation(kotlin("reflect"))
@@ -34,6 +36,17 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+    val compileScala = tasks.getByName<ScalaCompile>("${name.removeSuffix("Kotlin")}Scala")
+    dependsOn(compileScala)
+    classpath = classpath + project.files(compileScala)
+}
+
+tasks.withType<ScalaCompile> {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    setDependsOn(dependsOn.filter {
+        (it as? Task)?.name ?: (it as? String) != "${name.removeSuffix("Scala")}Java"
+    })
 }
 
 tasks.test {

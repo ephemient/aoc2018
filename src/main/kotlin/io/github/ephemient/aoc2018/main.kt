@@ -69,6 +69,9 @@ fun main(args: Array<String>) {
         println("Day 8")
         println(day8.part1())
         println(day8.part2())
+        val day8s = Day8s(resources["day8.txt"])
+        println(day8s.part1())
+        println(day8s.part2())
         println()
     }
 

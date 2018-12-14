@@ -19,4 +19,10 @@ open class Day8Bench {
 
     @Benchmark
     fun part2(): Int = Day8(lines).part2()
+
+    @Benchmark
+    fun part1s(): Int = Day8s(lines).part1()
+
+    @Benchmark
+    fun part2s(): Int = Day8s(lines).part2()
 }
