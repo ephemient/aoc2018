@@ -2,7 +2,7 @@
 Module:         Day15
 Description:    <https://adventofcode.com/2018/day/15 Day 15: Beverage Bandits>
 -}
-{-# LANGUAGE LambdaCase, NamedFieldPuns, RecordWildCards, TupleSections, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE LambdaCase, NamedFieldPuns, PatternGuards, RecordWildCards, TupleSections, TypeApplications, ViewPatterns #-}
 module Day15 (day15a, day15b) where
 
 import Control.Arrow ((&&&), (***))
@@ -15,7 +15,7 @@ import qualified Data.Map.Lazy as M ((!?), alterF, elems, empty, filter, findWit
 import Data.Maybe (listToMaybe, maybeToList)
 import Data.Semigroup (Max(Max), Min(Min), sconcat)
 import Data.Set (Set)
-import qualified Data.Set as S ((\\), empty, fromDistinctAscList, fromList, intersection, member, null, singleton, toList, union)
+import qualified Data.Set as S ((\\), empty, fromDistinctAscList, fromList, intersection, lookupMin, member, null, singleton, toList, union, unions)
 
 data Species = Elf | Goblin deriving (Eq)
 data Unit e = Unit {species :: Species, hp :: e}
@@ -51,17 +51,13 @@ caveToDebugString Cave {..} = concatMap ((++ "\n") . rowToDebugString) [y0..y1]
 adjacencies :: (Num a) => (a, a) -> Set (a, a)
 adjacencies (y, x) = S.fromDistinctAscList [(y - 1, x), (y, x - 1), (y, x + 1), (y + 1, x)]
 
-dijkstra :: (Num a, Ord a) => Set (a, a) -> (a, a) -> Map (a, a) Int
-dijkstra walls = dijkstra' 0 M.empty . S.singleton
-  where dijkstra' d m q
-          | S.null q = m
-          | otherwise = let m' = foldr (`M.insert` d) m q in
-                dijkstra' (d + 1) m' $ foldr (acc $ S.union walls $ M.keysSet m') S.empty q
-        acc walls' k q = S.union q $ adjacencies k S.\\ walls'
-
-move :: (Num a, Ord a) => Set (a, a) -> (a, a) -> (a, a) -> Maybe (a, a)
-move walls from to = let distances = dijkstra walls to in listToMaybe $ snd <$> sort
-    [(d, a) | a <- S.toList $ adjacencies from, d <- maybeToList $ distances M.!? a]
+nearest :: (Num a, Ord a) => Set (a, a) -> Set (a, a) -> (a, a) -> Maybe (a, a)
+nearest walls goals = nearest' walls . S.singleton
+  where nearest' visited q
+          | S.null q = Nothing
+          | reached <- S.intersection goals q, not $ S.null reached = S.lookupMin reached
+          | otherwise = nearest' visited' $ S.unions (adjacencies <$> S.toList q) S.\\ visited
+          where visited' = S.union visited q
 
 step :: (Monad m, Num i, Ord i, Ord e) => (Maybe (Unit e) -> m (Maybe (Unit e))) -> Set (i, i) -> Map (i, i) (Unit e) -> m (Map (i, i) (Unit e), Bool)
 step strike walls = step' M.empty
@@ -78,10 +74,9 @@ step strike walls = step' M.empty
             walls' = S.union walls $ M.keysSet allOtherUnits
             enemies = M.filter ((/= species unit) . species) allOtherUnits
             adjacentEnemies = adjacencies k `S.intersection` M.keysSet enemies
-            enemyRanges = S.fromList (M.keys enemies >>= S.toList . adjacencies) S.\\ walls'
-            distances = dijkstra walls' k
-            k' = case [(d, a) | a <- S.toList enemyRanges, d <- maybeToList $ distances M.!? a] of
-                (sort -> (_, move walls' k -> Just a):_) | S.null adjacentEnemies -> a
+            enemyRanges = S.unions (adjacencies <$> M.keys enemies) S.\\ walls'
+            k' = case if S.null adjacentEnemies then nearest walls' enemyRanges k else Nothing of
+                Just goal | Just move <- nearest walls' (adjacencies k) goal -> move
                 _ -> k
         step' past _ = return (past, True)
 
