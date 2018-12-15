@@ -40,6 +40,12 @@ day14a :: String -> String
 day14b :: String -> Int
 
 
+module Day15
+day15a :: String -> (Int, Int)
+day15b :: String -> (Int, (Int, Int))
+instance GHC.Classes.Eq Day15.Species
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
