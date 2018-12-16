@@ -44,3 +44,18 @@ fun <T> Iterable<T>.cycle(): Iterable<T> {
         }
     }
 }
+
+fun <T> Iterable<T>.splitToSequence(vararg delimiters: T, limit: Int = 0) = sequence<List<T>> {
+    val group = mutableListOf<T>()
+    var count = 1
+    for (element in this@splitToSequence) {
+        if ((limit <= 0 || count < limit) && element in delimiters) {
+            if (group.isNotEmpty()) yield(group.toList())
+            group.clear()
+            count++
+        } else {
+            group.add(element)
+        }
+    }
+    if (group.isNotEmpty()) yield(group.toList())
+}
