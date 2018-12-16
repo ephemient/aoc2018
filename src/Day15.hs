@@ -2,20 +2,23 @@
 Module:         Day15
 Description:    <https://adventofcode.com/2018/day/15 Day 15: Beverage Bandits>
 -}
-{-# LANGUAGE LambdaCase, NamedFieldPuns, PatternGuards, RecordWildCards, TupleSections, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE LambdaCase, NamedFieldPuns, PatternGuards, RecordWildCards, TypeApplications, ViewPatterns #-}
 module Day15 (day15a, day15b) where
 
 import Control.Arrow ((&&&), (***))
+import Control.Parallel.Strategies
 import Data.Either (partitionEithers)
+import Data.Foldable (asum)
 import Data.Functor.Identity (runIdentity)
-import Data.List (sort, sortOn)
+import Data.List (sortOn)
 import qualified Data.List.NonEmpty as NE (fromList)
 import Data.Map.Lazy (Map)
 import qualified Data.Map.Lazy as M ((!?), alterF, elems, empty, filter, findWithDefault, fromDistinctAscList, fromListWith, insert, keys, keysSet, minViewWithKey, null, restrictKeys, toAscList, toList, union)
-import Data.Maybe (listToMaybe, maybeToList)
+import Data.Maybe (fromJust)
 import Data.Semigroup (Max(Max), Min(Min), sconcat)
 import Data.Set (Set)
-import qualified Data.Set as S ((\\), empty, fromDistinctAscList, fromList, intersection, lookupMin, member, null, singleton, toList, union, unions)
+import qualified Data.Set as S ((\\), fromDistinctAscList, intersection, lookupMin, member, null, singleton, toList, union, unions)
+import GHC.Conc (numCapabilities)
 
 data Species = Elf | Goblin deriving (Eq)
 data Unit e = Unit {species :: Species, hp :: e}
@@ -92,11 +95,12 @@ day15a (caveFromString @Int (const 200) -> cave) = runIdentity $ outcome strike 
         strike _ = return Nothing
 
 day15b :: String -> (Int, (Int, Int))
-day15b (caveFromString @Int (const 200) -> cave) = head $ do
-    elfPower <- [3..200]
-    let strike (Just unit@Unit {species = Elf, hp})
-          | hp > 3 = [Just unit {hp = hp - 3}]
+day15b (caveFromString @Int (const 200) -> cave) = fromJust $ asum $ parallelize
+    [(,) elfPower <$> outcome (strike elfPower) cave | elfPower <- [3..]]
+  where strike _ (Just unit@Unit {species = Elf, hp})
+          | hp > 3 = return $ Just unit {hp = hp - 3}
           | otherwise = fail "oh noes!"
-        strike (Just unit@Unit {hp}) | hp > elfPower = [Just unit {hp = hp - elfPower}]
-        strike _ = [Nothing]
-    (elfPower,) <$> outcome strike cave
+        strike elfPower (Just unit@Unit {hp})
+          | hp > elfPower = return $ Just unit {hp = hp - elfPower}
+        strike _ _ = return Nothing
+        parallelize = withStrategy $ parBuffer numCapabilities rseq
