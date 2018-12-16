@@ -46,6 +46,15 @@ day15b :: String -> (Int, (Int, Int))
 instance GHC.Classes.Eq Day15.Species
 
 
+module Day16
+day16a :: String -> Maybe Int
+day16b :: String -> Maybe Int
+instance GHC.Classes.Ord Day16.Op
+instance GHC.Classes.Eq Day16.Op
+instance GHC.Enum.Enum Day16.Op
+instance GHC.Enum.Bounded Day16.Op
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
