@@ -112,12 +112,17 @@ import Day14 (day14a, day14b)
 ```haskell
 import Day15 (day15a, day15b)
 ```
+## [Day 16: Chronal Classification](/src/Day16.hs)
+```haskell
+import Day16 (day16a, day16b)
+```
 
 ---
 
 ```haskell
 import Control.Monad (when)
 import Data.Maybe (mapMaybe)
+import Debug.Trace (traceShowId)
 import Paths_aoc2018 (getDataFileName)
 import System.Environment (getArgs)
 import Text.Read (readMaybe)
@@ -159,5 +164,6 @@ main = do
     run 12 getDayInput (putStrLn . maybeBottom show) [day12 20, day12 50000000000]
     run 13 getDayInput putStrLn [day13a, day13b]
     run 14 getDayInput putStrLn [day14a, show . day14b]
-    run 15 getDayInput (print . uncurry (*)) [day15a, snd . day15b]
+    run 15 getDayInput (print . uncurry (*)) [traceShowId . day15a, snd . traceShowId . day15b]
+    run 16 getDayInput (putStrLn . maybeBottom show) [day16a, day16b]
 ```
