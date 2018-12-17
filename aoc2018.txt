@@ -55,6 +55,12 @@ instance GHC.Enum.Enum Day16.Op
 instance GHC.Enum.Bounded Day16.Op
 
 
+module Day17
+day17a :: String -> Maybe Int
+day17b :: String -> Maybe Int
+instance GHC.Classes.Eq Day17.Element
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
