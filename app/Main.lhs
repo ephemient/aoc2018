@@ -116,6 +116,10 @@ import Day15 (day15a, day15b)
 ```haskell
 import Day16 (day16a, day16b)
 ```
+## [Day 17: Reservoir Research](/src/Day17.hs)
+```haskell
+import Day17 (day17a, day17b)
+```
 
 ---
 
@@ -165,4 +169,5 @@ main = do
     run 14 getDayInput putStrLn [day14a, show . day14b]
     run 15 getDayInput (print . uncurry (*)) [day15a, snd . day15b]
     run 16 getDayInput (putStrLn . maybeBottom show) [day16a, day16b]
+    run 17 getDayInput (putStrLn . maybeBottom show) [day17a, day17b]
 ```
