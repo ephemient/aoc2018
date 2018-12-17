@@ -62,10 +62,10 @@ class Day17(lines: List<String>) {
         return (minY..maxY).joinToString(separator = "\n", prefix = header) { y ->
             (minX..maxX).joinToString(separator = "") { x ->
                 when (units[IntPair(y, x)]) {
+                    null -> "."
                     Element.Wall -> "#"
                     Element.Stagnant -> "~"
                     Element.Flowing -> "|"
-                    else -> "."
                 }
             }
         }
@@ -77,18 +77,18 @@ class Day17(lines: List<String>) {
         x0: Int = startX,
         x1: Int = x0
     ): Boolean = y <= maxY && (x0..x1)
-        .filter { units[IntPair(y, it)].isSpace }
+        .filter { IntPair(y, it) !in units }
         .ranges()
         .map { range ->
             if (!flood(units, y + 1, range.first, range.last)) {
                 for (x in range) units[IntPair(y, x)] = Element.Flowing
                 return@map false
             }
-            val lefts = (range.first - 1 downTo minX).takeWhile { units[IntPair(y, it)].isSpace }
-            val l = lefts.firstOrNull { units[IntPair(y + 1, it)].isSpaceOrFlowing }
+            val lefts = (range.first - 1 downTo minX).takeWhile { IntPair(y, it) !in units }
+            val l = lefts.firstOrNull { units[IntPair(y + 1, it)].isFlowingOrNull }
                 ?: lefts.lastOrNull()
-            val rights = (range.last + 1..maxX).takeWhile { units[IntPair(y, it)].isSpace }
-            val r = rights.firstOrNull { units[IntPair(y + 1, it)].isSpaceOrFlowing }
+            val rights = (range.last + 1..maxX).takeWhile { IntPair(y, it) !in units }
+            val r = rights.firstOrNull { units[IntPair(y + 1, it)].isFlowingOrNull }
                 ?: rights.lastOrNull()
             for (x in range) units[IntPair(y, x)] = Element.Wall
             val blockedL = l == null || flood(units, y, l, range.first - 1)
@@ -101,17 +101,14 @@ class Day17(lines: List<String>) {
         .fold((x0..x1).all { units[IntPair(y, it)] != Element.Flowing }) { a, b -> a && b }
 
     private enum class Element {
-        Space, Wall, Stagnant, Flowing
+        Wall, Stagnant, Flowing
     }
 
     companion object {
         private val LINE_PATTERN = """([xy])=(\d+), (?!\1)[xy]=(\d+)..(\d+)""".toRegex()
         private const val startX = 500
 
-        private val Element?.isSpace: Boolean
-            get() = this == null || this == Element.Space
-
-        private val Element?.isSpaceOrFlowing: Boolean
-            get() = this == null || this == Element.Space || this == Element.Flowing
+        private val Element?.isFlowingOrNull: Boolean
+            get() = this == null || this == Element.Flowing
     }
 }
