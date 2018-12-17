@@ -45,6 +45,29 @@ fun <T> Iterable<T>.cycle(): Iterable<T> {
     }
 }
 
+fun Iterable<Int>.ranges(): List<IntRange> {
+    val ranges = mutableListOf<IntRange>()
+    var lo: Int? = null
+    var hi: Int? = null
+    for (element in this) when {
+        lo == null || hi == null -> {
+            lo = element
+            hi = element
+        }
+        element in lo - 1..hi + 1 -> {
+            lo = minOf(lo, element)
+            hi = maxOf(hi, element)
+        }
+        else -> {
+            ranges.add(lo..hi)
+            lo = element
+            hi = element
+        }
+    }
+    if (lo != null && hi != null) ranges.add(lo..hi)
+    return ranges
+}
+
 fun <T> Iterable<T>.splitToSequence(vararg delimiters: T, limit: Int = 0) = sequence<List<T>> {
     val group = mutableListOf<T>()
     var count = 1
