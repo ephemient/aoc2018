@@ -61,6 +61,10 @@ day17b :: String -> Maybe Int
 instance GHC.Classes.Eq Day17.Element
 
 
+module Day18
+day18 :: Int -> String -> Int
+
+
 module Day2
 day2a :: String -> Int
 day2b :: String -> Maybe String
