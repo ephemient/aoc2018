@@ -124,6 +124,10 @@ import Day17 (day17a, day17b)
 ```haskell
 import Day18 (day18)
 ```
+## [Day 19: Go With The Flow](/src/Day19.hs)
+```haskell
+import Day19 (day19)
+```
 
 ---
 
@@ -175,4 +179,5 @@ main = do
     run 16 getDayInput (putStrLn . maybeBottom show) [day16a, day16b]
     run 17 getDayInput (putStrLn . maybeBottom show) [day17a, day17b]
     run 18 getDayInput print [day18 10, day18 1000000000]
+    run 19 getDayInput (putStrLn . maybeBottom show) [day19 0, day19 1]
 ```
