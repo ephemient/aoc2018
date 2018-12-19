@@ -6,6 +6,7 @@ Description:    <https://adventofcode.com/2018/day/19 Day 19: Go With The Flow>
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 module Day19 (day19) where
 
+import Control.Monad (join)
 import Data.Array.Unboxed (Array, IArray, Ix, UArray, (!), (//), bounds, inRange, listArray)
 import Data.Bits (Bits, (.&.), (.|.))
 import Data.Bool (bool)
@@ -56,6 +57,14 @@ doOp r EQIR a b = bool 0 1 $ a == r ! b
 doOp r EQRI a b = bool 0 1 $ r ! a == b
 doOp r EQRR a b = bool 0 1 $ r ! a == r ! b
 
+sumFactors :: (Integral a) => a -> a
+sumFactors n = sum
+  [ d + if d == q then 0 else q
+  | d <- takeWhile ((<= n) . join (*)) [1..]
+  , let (q, r) = n `divMod` d
+  , r == 0
+  ]
+
 step :: (IArray a1 i, IArray a2 (Instruction i), Bits i, Integral i, Ix i) => i -> a2 i (Instruction i) -> a1 i i -> a1 i i
 step ip isns regs
   | base <- regs ! ip, inRange (bounds isns) (base + 14)
@@ -75,10 +84,7 @@ step ip isns regs
   , Instruction ADDR k' ip' ip'' <- isns ! (base + 13), k == k', ip == ip', ip == ip''
   , Instruction SETI base' _ ip' <- isns ! (base + 14), base == base', ip == ip'
   , goal <- regs ! n, goal > 0
-  = regs //
-  [ (ip, base + 15), (i, goal + 1), (j, goal + 1), (k, 1)
-  , (m, regs ! m + sum [a | a <- [1..goal], goal `mod` a == 0])
-  ]
+  = regs // [(ip, base + 15), (i, goal + 1), (j, goal + 1), (k, 1), (m, regs ! m + sumFactors goal)]
   | otherwise = regs // if ip == c then [(ip, result + 1)] else [(ip, regs ! ip + 1), (c, result)]
   where Instruction {..} = isns ! (regs ! ip)
         result = doOp regs op a b
