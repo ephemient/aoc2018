@@ -19,9 +19,8 @@ import Text.Megaparsec.Char.Lexer (decimal)
 data Op
   = ADDR | ADDI | MULR | MULI | BANR | BANI | BORR | BORI
   | SETR | SETI | GTIR | GTRI | GTRR | EQIR | EQRI | EQRR
-  deriving (Bounded, Enum, Eq, Ord, Show)
+
 data Instruction i = Instruction {op :: Op, a :: i, b :: i, c :: i}
-  deriving (Eq, Ord, Show)
 
 parser :: (IArray a (Instruction i), MonadParsec e String m, Integral i, Ix i) => m (i, a i (Instruction i))
 parser = do
