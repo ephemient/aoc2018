@@ -67,14 +67,6 @@ day18 :: Int -> String -> Int
 
 module Day19
 day19 :: Int -> String -> Maybe Int
-instance GHC.Show.Show i => GHC.Show.Show (Day19.Instruction i)
-instance GHC.Classes.Ord i => GHC.Classes.Ord (Day19.Instruction i)
-instance GHC.Classes.Eq i => GHC.Classes.Eq (Day19.Instruction i)
-instance GHC.Show.Show Day19.Op
-instance GHC.Classes.Ord Day19.Op
-instance GHC.Classes.Eq Day19.Op
-instance GHC.Enum.Enum Day19.Op
-instance GHC.Enum.Bounded Day19.Op
 
 
 module Day2
