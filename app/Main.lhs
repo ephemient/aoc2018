@@ -128,6 +128,10 @@ import Day18 (day18)
 ```haskell
 import Day19 (day19)
 ```
+## [Day 20: A Regular Map](/src/Day20.hs)
+```haskell
+import Day20 (day20a, day20b)
+```
 
 ---
 
@@ -180,4 +184,5 @@ main = do
     run 17 getDayInput (putStrLn . maybeBottom show) [day17a, day17b]
     run 18 getDayInput print [day18 10, day18 1000000000]
     run 19 getDayInput (putStrLn . maybeBottom show) [day19 0, day19 1]
+    run 20 getDayInput print [day20a, day20b]
 ```
