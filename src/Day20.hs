@@ -18,8 +18,7 @@ buildGraph (dropWhile (== '^') . dropWhileEnd (== '$') . filter (not . isSpace) 
         buildGraph' stack vs es p ('(':ds) = buildGraph' (p:stack) vs es p ds
         buildGraph' stack@(p:_) vs es _ ('|':ds) = buildGraph' stack vs es p ds
         buildGraph' (p:stack) vs es _ (')':ds) = buildGraph' stack vs es p ds
-        buildGraph' stack vs es p@(x, y) (d:ds)
-          | d `elem` "NESW" = buildGraph' stack vs' ((vs ! p, v):es) p' ds
+        buildGraph' stack vs es p@(x, y) (d:ds) = buildGraph' stack vs' ((vs ! p, v):es) p' ds
           where p' = case d of
                     'N' -> (x, y - 1)
                     'E' -> (x + 1, y)
