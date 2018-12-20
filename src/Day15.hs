@@ -36,7 +36,7 @@ caveFromString initialHP string =
             _ -> []
 
 caveToDebugString :: (Integral i, Show e) => Cave i e -> String
-caveToDebugString Cave {..} = concatMap ((++ "\n") . rowToDebugString) [y0..y1]
+caveToDebugString Cave {..} = unlines $ map rowToDebugString [y0..y1]
   where ((Min y0, Max y1), (Min x0, Max x1)) = sconcat . NE.fromList $
             ((Min &&& Max) *** (Min &&& Max)) <$> S.toList walls
         rowToDebugString y =
