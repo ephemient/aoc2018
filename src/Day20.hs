@@ -17,7 +17,7 @@ import Data.Maybe (fromMaybe)
 import Data.Sequence (Seq((:<|)), (><))
 import qualified Data.Sequence as Seq (fromList, singleton)
 import Data.Set (mapMonotonic)
-import qualified Data.Set as Set (singleton, union)
+import qualified Data.Set as Set (empty, singleton, union)
 
 buildGraph :: String -> Map Int IntSet
 buildGraph (dropWhile (== '^') . dropWhileEnd (== '$') . filter (not . isSpace) -> input) = graph
@@ -30,7 +30,7 @@ buildGraph (dropWhile (== '^') . dropWhileEnd (== '$') . filter (not . isSpace) 
         acc (p:ps, !m) 'E' = (mapMonotonic east p : ps,) <$> foldM (move east) m p
         acc (p:ps, !m) 'S' = (mapMonotonic south p : ps,) <$> foldM (move south) m p
         acc (p:ps, !m) 'W' = (mapMonotonic west p : ps,) <$> foldM (move west) m p
-        acc (p:ps, !m) '(' = return (p:p:p:ps, m)
+        acc (p:ps, !m) '(' = return (p : p : Set.empty : ps, m)
         acc (p:q:r:ps, !m) '|' = return (q : q : Set.union p r : ps, m)
         acc (p:_:q:ps, !m) ')' = return (Set.union p q : ps, m)
         (north, east, south, west) = (second pred, first succ, second succ, first pred)
