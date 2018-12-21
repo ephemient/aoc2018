@@ -132,6 +132,10 @@ import Day19 (day19)
 ```haskell
 import Day20 (day20a, day20b)
 ```
+## [Day 21: Chronal Conversion](/src/Day21.hs)
+```haskell
+import Day21 (day21a, day21b)
+```
 
 ---
 
@@ -185,4 +189,5 @@ main = do
     run 18 getDayInput print [day18 10, day18 1000000000]
     run 19 getDayInput (putStrLn . maybeBottom show) [day19 0, day19 1]
     run 20 getDayInput print [day20a, day20b]
+    run 21 getDayInput (putStrLn . maybeBottom show) [day21a, day21b]
 ```
