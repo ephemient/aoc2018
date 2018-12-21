@@ -51,15 +51,15 @@ class Day21(lines: List<String>) {
             if (base + 8 !in instructions.indices) return@run
             val (_, _, _, t) = instructions[base]
                 .takeIf { it.op == Op.SETI && it.a == 0 } ?: return@run
-            if (t == ip) return@run
+            if (t == 0 || t == ip) return@run
             val (_, _, _, u) = instructions[base + 1]
                 .takeIf { it.op == Op.ADDI && it.a == t && it.b == 1 } ?: return@run
-            if (u == ip || u == t) return@run
+            if (u == 0 || u == ip || u == t) return@run
             val (_, _, n, _) = instructions[base + 2]
                 .takeIf { it.op == Op.MULI && it.a == u && it.b > 0 && it.c == u } ?: return@run
             val (_, _, r, _) = instructions[base + 3]
                 .takeIf { it.op == Op.GTRR && it.a == u && it.b > 0 && it.c == u } ?: return@run
-            if (r == ip || r == t || r == u) return@run
+            if (r == 0 || r == ip || r == t || r == u) return@run
             val (_, _, _, _) = instructions[base + 4]
                 .takeIf { it.op == Op.ADDR && it.a == u && it.b == ip && it.c == ip } ?: return@run
             val (_, _, _, _) = instructions[base + 5]
