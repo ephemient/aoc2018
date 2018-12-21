@@ -87,7 +87,7 @@ day21a :: String -> Maybe Int
 day21a input = do
     (ip, isns) <- parseMaybe @() (parser @Array) input
     let regs = listArray @UArray (0, 5) $ repeat 0
-    return $ runCont (callCC $ \f -> iterateM_ (step f ip isns) regs) id
+    return $ flip runCont id $ callCC $ \f -> iterateM_ (step f ip isns) regs
 
 day21b :: String -> Maybe Int
 day21b input = do
@@ -96,6 +96,5 @@ day21b input = do
         reportDup f i = do
             (seen, prior) <- get
             if i `S.member` seen then f prior else put (S.insert i seen, i)
-    return $ evalState
-        (runContT (callCC $ \f -> iterateM_ (step (reportDup f) ip isns) regs) return)
-        (S.empty, undefined)
+    return $ flip evalState (S.empty, undefined) $ flip runContT return $ callCC $ \f ->
+        iterateM_ (step (reportDup f) ip isns) regs

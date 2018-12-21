@@ -2,7 +2,7 @@
 Module:         Day18
 Description:    <https://adventofcode.com/2018/day/18 Day 18: Settlers of The North Pole>
 -}
-{-# LANGUAGE FlexibleContexts, PatternGuards, ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts, ViewPatterns #-}
 module Day18 (day18) where
 
 import Control.Applicative (liftA2)

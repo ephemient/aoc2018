@@ -2,7 +2,7 @@
 Module:         Day19
 Description:    <https://adventofcode.com/2018/day/19 Day 19: Go With The Flow>
 -}
-{-# LANGUAGE FlexibleContexts, NamedFieldPuns, PatternGuards, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RecordWildCards, TypeApplications #-}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 module Day19 (day19) where
 

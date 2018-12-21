@@ -2,7 +2,7 @@
 Module:         Day15
 Description:    <https://adventofcode.com/2018/day/15 Day 15: Beverage Bandits>
 -}
-{-# LANGUAGE LambdaCase, NamedFieldPuns, PatternGuards, RecordWildCards, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE LambdaCase, NamedFieldPuns, RecordWildCards, TypeApplications, ViewPatterns #-}
 module Day15 (day15a, day15b) where
 
 import Control.Arrow ((&&&), (***))

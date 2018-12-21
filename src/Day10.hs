@@ -2,7 +2,7 @@
 Module:         Day10
 Description:    <https://adventofcode.com/2018/day/10 Day 10: The Stars Align>
 -}
-{-# LANGUAGE FlexibleContexts, GADTs, NamedFieldPuns, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, NamedFieldPuns, RecordWildCards, TypeApplications #-}
 module Day10 (day10) where
 
 import Control.Arrow ((&&&))
