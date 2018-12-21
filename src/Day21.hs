@@ -74,7 +74,7 @@ step f ip isns regs
   , Instruction ADDR u' ip' ip'' <- isns ! (base + 4), u == u', ip == ip', ip == ip''
   , Instruction ADDI ip' 1 ip'' <- isns ! (base + 5), ip == ip', ip == ip''
   , Instruction SETI base' _ ip' <- isns ! (base + 6), base + 8 == base', ip == ip'
-  , Instruction ADDI t' u' t'' <- isns ! (base + 7), t == t', u == u', t == t''
+  , Instruction ADDI t' 1 t'' <- isns ! (base + 7), t == t', t == t''
   , Instruction SETI base' _ ip' <- isns ! (base + 8), base == base', ip == ip'
   = return $ regs // [(ip, base + 9), (t, max 0 $ regs ! r `div` n), (u, 1)]
   | otherwise
