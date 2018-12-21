@@ -62,8 +62,8 @@ doOp r EQRR a b = bool 0 1 $ r ! a == r ! b
 step :: (Monad m, IArray a1 i, IArray a2 (Instruction i), Bits i, Integral i, Ix i, Show (a1 i i)) => (i -> m ()) -> i -> a2 i (Instruction i) -> a1 i i -> m (a1 i i)
 step f ip isns regs
   | c == 0 = fail "writing value to register 0"
-  | op == EQRR, a == 0, c /= ip = regs // [(c, 0), (ip, regs ! ip + 1)] <$ f (regs ! b)
-  | op == EQRR, b == 0, c /= ip = regs // [(c, 0), (ip, regs ! ip + 1)] <$ f (regs ! a)
+  | op == EQRR, a == 0, b /= 0, c /= ip = regs // [(c, 0), (ip, regs ! ip + 1)] <$ f (regs ! b)
+  | op == EQRR, a /= 0, b == 0, c /= ip = regs // [(c, 0), (ip, regs ! ip + 1)] <$ f (regs ! a)
   | (op /= SETI && a == 0) || (op `elem` [ADDR, MULR, BANR, BORR, GTIR, GTRR, EQIR, EQRR] && b == 0)
   = fail "reading from register 0"
   | inRange (bounds isns) (base + 8)
