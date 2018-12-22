@@ -5,12 +5,11 @@ Description:    <https://adventofcode.com/2018/day/22 Day 22: Mode Maze>
 {-# LANGUAGE FlexibleContexts, MultiWayIf, TupleSections, TypeApplications, ViewPatterns #-}
 module Day22 (day22a, day22b) where
 
-import Control.Monad.ST (runST)
+import Control.Monad.State.Strict (evalState, get, put)
 import Data.Array.Unboxed (IArray, Ix, UArray, (!), (//), accumArray, assocs, bounds, elems, listArray, rangeSize)
 import Data.Function (on)
 import qualified Data.Heap as Heap (MinPolicy, insert, singleton, view)
 import qualified Data.Map.Strict as Map (empty, insert, lookup)
-import Data.STRef (newSTRef, readSTRef, writeSTRef)
 import Data.List ((\\), scanl')
 import Text.Megaparsec (MonadParsec, between, parseMaybe)
 import Text.Megaparsec.Char (char, newline, string)
@@ -49,19 +48,18 @@ day22a input = do
 day22b :: String -> Maybe Int
 day22b input = do
     (depth, target) <- parseMaybe @() (parser @Int @Int) input
-    runST $ do
-        mazeRef <- newSTRef $ makeMaze @UArray depth target
+    flip evalState (makeMaze @UArray depth target) $ do
         let bfs (Heap.view -> Just ((_, (w, k@(p, e))), heap), ws)
               | 1 <- e, (0, 0) <- p = return $ Just w
               | Just w' <- Map.lookup k ws, w' <= Left w = bfs (heap, ws)
               | otherwise = neighbors w p e >>= bfs . commit heap (Map.insert k (Left w) ws)
             bfs _ = return Nothing
             neighbors w p@(x, y) e = do
-                maze <- readSTRef mazeRef
+                maze <- get
                 let ((0, 0), (maxX, maxY)) = bounds maze
                 maze' <- if x < maxX && y < maxY then return maze else
                     let maze' = growMaze depth (grow x maxX, grow y maxY) maze
-                    in maze' <$ writeSTRef mazeRef maze'
+                    in maze' <$ put maze'
                 return $ [(w + 7, (p, e')) | e' <- [0..2] \\ [risk depth $ maze' ! p, e]] ++
                     [(w + 1, (p', e)) | x > 0, let p' = (x - 1, y), risk depth (maze' ! p') /= e] ++
                     [(w + 1, (p', e)) | y > 0, let p' = (x, y - 1), risk depth (maze' ! p') /= e] ++
@@ -73,4 +71,4 @@ day22b input = do
                       | otherwise = (Heap.insert (e, a) heap', Map.insert k (Right e) ws')
         bfs (Heap.singleton @Heap.MinPolicy (0, (0, (target, 1))), Map.empty)
   where estimate w ((x, y), e) = w + x + y + if e == 1 then 0 else 7
-        grow n = head . dropWhile (<= n) . iterate (* 2)
+        grow n = head . dropWhile (<= n) . iterate (+ 50)
