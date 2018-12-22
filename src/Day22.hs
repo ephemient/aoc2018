@@ -71,5 +71,5 @@ day22b input = do
                     [(w + 1, (e, (x, y - 1))) | y > 0] ++
                     [(w + 1, (e, (x + 1, y))), (w + 1, (e, (x, y + 1)))]
                 return $ change ++ move
-            estimate a@(w, (_, (x, y))) = (w + x + y, a)
+            estimate a@(w, (e, (x, y))) = (w + x + y + if e == 1 then 0 else 7, a)
         bfs $ Heap.singleton @Heap.FstMinPolicy (0, (0, (1, target)))
