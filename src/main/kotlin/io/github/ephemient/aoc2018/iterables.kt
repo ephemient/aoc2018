@@ -1,12 +1,16 @@
 package io.github.ephemient.aoc2018
 
-fun <T, R> Iterable<T>.accumulate(initial: R, operation: (acc: R, T) -> R): Iterable<R> {
+fun <T, R> Iterable<T>.accumulate(
+    initial: R,
+    skipFirst: Boolean = false,
+    operation: (acc: R, T) -> R
+): Iterable<R> {
     val self = this
     return object : Iterable<R> {
         override fun iterator(): Iterator<R> {
             return object : AbstractIterator<R>() {
                 private val iter = self.iterator()
-                private var hasStarted = false
+                private var hasStarted = skipFirst
                 private var acc = initial
                 override fun computeNext() {
                     when {

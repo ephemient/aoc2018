@@ -43,19 +43,19 @@ class Day22(lines: List<String>) {
             do h *= 2 while (h < pos.second)
             for ((x, row) in maze.withIndex()) {
                 row.addAll(if (x == 0) { 48271 * row.size..48271 * h step 48271 } else {
-                    (row.size..h).accumulate(row.last()) { up, y ->
+                    (row.size..h).accumulate(row.last(), skipFirst = true) { up, y ->
                         ((up + depth) % 20183) * ((maze[x - 1][y] + depth) % 20183)
-                    }.drop(1)
+                    }
                 })
             }
         }
         var w = maze.lastIndex
         while (w <= pos.first) w *= 2
-        maze.addAll((maze.size..w).accumulate(maze.last()) { left, x ->
+        maze.addAll((maze.size..w).accumulate(maze.last(), skipFirst = true) { left, x ->
             (1..h).accumulate(16807 * x) { up, y ->
                 ((up + depth) % 20183) * ((left[y] + depth) % 20183)
             }.toMutableList()
-        }.drop(1))
+        })
         return (maze[pos.first][pos.second] + depth) % 20183 % 3
     }
 
