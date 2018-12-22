@@ -136,6 +136,10 @@ import Day20 (day20a, day20b)
 ```haskell
 import Day21 (day21a, day21b)
 ```
+## [Day 22: Mode Maze](/src/Day22.hs)
+```haskell
+import Day22 (day22a, day22b)
+```
 
 ---
 
@@ -190,4 +194,5 @@ main = do
     run 19 getDayInput (putStrLn . maybeBottom show) [day19 0, day19 1]
     run 20 getDayInput print [day20a, day20b]
     run 21 getDayInput (putStrLn . maybeBottom show) [day21a, day21b]
+    run 22 getDayInput (putStrLn . maybeBottom show) [day22a, day22b]
 ```
