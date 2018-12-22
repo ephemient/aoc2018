@@ -2,12 +2,11 @@
 Module:         Day22
 Description:    <https://adventofcode.com/2018/day/22 Day 22: Mode Maze>
 -}
-{-# LANGUAGE FlexibleContexts, LambdaCase, TupleSections, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, TypeApplications, ViewPatterns #-}
 module Day22 (day22a, day22b) where
 
 import Data.Array.ST (newArray, readArray, runSTArray, writeArray)
-import Data.Array.Unboxed (IArray, Ix, UArray, (!), (//), elems, listArray, rangeSize)
-import Data.Function (on)
+import Data.Array.Unboxed (IArray, Ix, UArray, (!), elems, listArray, rangeSize)
 import qualified Data.Heap as Heap (FstMinPolicy, insert, singleton, view)
 import Data.List ((\\), scanl')
 import Text.Megaparsec (MonadParsec, between, parseMaybe)
@@ -18,10 +17,11 @@ parser :: (Integral a, Integral i, MonadParsec e String m) => m (a, (i, i))
 parser = (,) <$> between (string "depth: ") newline decimal
     <*> between (string "target: ") newline ((,) <$> decimal <*> (char ',' *> decimal))
 
-makeMaze :: (IArray a e, Integral e, Ix i, Num i) => e -> (i, i) -> (i, i) -> a (i, i) e
-makeMaze depth target size@(_, rangeSize . (0,) -> n) = listArray ((0, 0), size)
-    (map risk $ scanl acc [0, 48271..] [16807, 33614..] >>= take n) // [(target, risk 0)]
-  where acc (drop 1 -> prev) start = scanl' ((*) `on` erosion) start prev
+makeMaze :: (IArray a e, Enum e, Integral e, Ix e) => e -> (e, e) -> (e, e) -> a (e, e) e
+makeMaze depth (targetX, targetY) size@(_, sizeY) = listArray ((0, 0), size) $ map risk $
+    scanl acc [0, 48271..] [1..] >>= take (rangeSize (0, sizeY))
+  where acc (drop 1 -> prev) x = scanl' (acc' x) (16807 * x) $ zip [1..] prev
+        acc' x left (y, up) = if x == targetX && y == targetY then 0 else erosion left * erosion up
         erosion = (`mod` 20183) . (+ depth)
         risk = (`mod` 3) . erosion
 
