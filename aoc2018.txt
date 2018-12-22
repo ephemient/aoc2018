@@ -85,6 +85,11 @@ day21b :: String -> Maybe Int
 instance GHC.Classes.Eq Day21.Op
 
 
+module Day22
+day22a :: String -> Maybe Int
+day22b :: String -> Maybe Int
+
+
 module Day3
 day3a :: String -> Maybe Int
 day3b :: String -> Maybe Int
