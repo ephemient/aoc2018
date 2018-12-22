@@ -2,7 +2,7 @@
 Module:         Day22
 Description:    <https://adventofcode.com/2018/day/22 Day 22: Mode Maze>
 -}
-{-# LANGUAGE FlexibleContexts, LambdaCase, MultiWayIf, TupleSections, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts, MultiWayIf, TupleSections, TypeApplications, ViewPatterns #-}
 module Day22 (day22a, day22b) where
 
 import Control.Monad.ST (runST)
@@ -10,7 +10,7 @@ import Data.Array.Unboxed (IArray, Ix, UArray, (!), (//), accumArray, assocs, bo
 import Data.Function (on)
 import qualified Data.Heap as Heap (MinPolicy, insert, singleton, view)
 import qualified Data.Map.Strict as Map (empty, insert, lookup)
-import Data.STRef (newSTRef, modifySTRef', readSTRef, writeSTRef)
+import Data.STRef (newSTRef, readSTRef, writeSTRef)
 import Data.List ((\\), scanl')
 import Text.Megaparsec (MonadParsec, between, parseMaybe)
 import Text.Megaparsec.Char (char, newline, string)
@@ -51,27 +51,26 @@ day22b input = do
     (depth, target) <- parseMaybe @() (parser @Int @Int) input
     runST $ do
         mazeRef <- newSTRef $ makeMaze @UArray depth target
-        wsRef <- newSTRef Map.empty
-        let bfs (Heap.view -> Just ((_, (w, k@(p, e))), heap))
+        let bfs (Heap.view -> Just ((_, (w, k@(p, e))), heap), ws)
               | 1 <- e, (0, 0) <- p = return $ Just w
-              | otherwise = Map.lookup k <$> readSTRef wsRef >>= \case
-                    Just w' | w' <= w -> bfs heap
-                    _ -> modifySTRef' wsRef (Map.insert k w) >>
-                        foldr (Heap.insert . estimate) heap <$> neighbors w p e >>= bfs
+              | Just w' <- Map.lookup k ws, w' <= Left w = bfs (heap, ws)
+              | otherwise = neighbors w p e >>= bfs . commit heap (Map.insert k (Left w) ws)
             bfs _ = return Nothing
             neighbors w p@(x, y) e = do
                 maze <- readSTRef mazeRef
                 let ((0, 0), (maxX, maxY)) = bounds maze
-                maze' <- if x < maxX && y < maxY then return maze else do
+                maze' <- if x < maxX && y < maxY then return maze else
                     let maze' = growMaze depth (grow x maxX, grow y maxY) maze
-                    maze' <$ writeSTRef mazeRef maze'
-                ws <- readSTRef wsRef
-                return $ filter (\(w', k) -> maybe True (> w') $ Map.lookup k ws) $
-                    [(w + 7, (p, e')) | e' <- [0..2] \\ [risk depth $ maze' ! p, e]] ++
+                    in maze' <$ writeSTRef mazeRef maze'
+                return $ [(w + 7, (p, e')) | e' <- [0..2] \\ [risk depth $ maze' ! p, e]] ++
                     [(w + 1, (p', e)) | x > 0, let p' = (x - 1, y), risk depth (maze' ! p') /= e] ++
                     [(w + 1, (p', e)) | y > 0, let p' = (x, y - 1), risk depth (maze' ! p') /= e] ++
                     [(w + 1, (p', e)) | let p' = (x + 1, y), risk depth (maze' ! p') /= e] ++
                     [(w + 1, (p', e)) | let p' = (x, y + 1), risk depth (maze' ! p') /= e]
-        bfs $ Heap.singleton @Heap.MinPolicy (0, (0, (target, 1)))
-  where estimate a@(w, ((x, y), e)) = (w + x + y + if e == 1 then 0 else 7, a)
+            commit heap ws = foldr acc (heap, ws)
+              where acc a@(w, k@(estimate w -> e)) (heap', ws')
+                      | Just w' <- Map.lookup k ws, w' <= Right e = (heap', ws')
+                      | otherwise = (Heap.insert (e, a) heap', Map.insert k (Right e) ws')
+        bfs (Heap.singleton @Heap.MinPolicy (0, (0, (target, 1))), Map.empty)
+  where estimate w ((x, y), e) = w + x + y + if e == 1 then 0 else 7
         grow n = head . dropWhile (<= n) . iterate (* 2)
