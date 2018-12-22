@@ -37,7 +37,8 @@ day22b input = do
         maze = makeMaze @UArray depth target size
         bfs (Heap.view -> Just ((w, k@(e, p)), heap)) ws = readArray ws k >>= \case
             Just w' | w' <= w -> bfs heap ws
-            _ -> writeArray ws k (Just w) >> bfs (foldr Heap.insert heap $ neighbors w e p) ws
+            _ -> writeArray ws k (Just w) >> if k == (1, target) then return ws else
+                bfs (foldr Heap.insert heap $ neighbors w e p) ws
         bfs _ ws = return ws
         neighbors :: Int -> Int -> (Int, Int) -> [(Int, (Int, (Int, Int)))]
         neighbors w e p@(x, y) =
