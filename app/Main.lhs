@@ -140,6 +140,10 @@ import Day21 (day21a, day21b)
 ```haskell
 import Day22 (day22a, day22b)
 ```
+## [Day 23: Experimental Emergency Teleportation](/src/Day23.hs)
+```haskell
+import Day23 (day23a, day23b)
+```
 
 ---
 
@@ -195,4 +199,5 @@ main = do
     run 20 getDayInput print [day20a, day20b]
     run 21 getDayInput (putStrLn . maybeBottom show) [day21a, day21b]
     run 22 getDayInput (putStrLn . maybeBottom show) [day22a, day22b]
+    run 23 getDayInput (putStrLn . maybeBottom show) [day23a, day23b]
 ```
