@@ -1,5 +1,5 @@
 # [Advent of Code 2018](https://adventofcode.com/2018)
-### my answers in [Kotlin](https://www.kotlinlang.org/) (see also [Haskell branch](https://github.com/ephemient/aoc2018/tree/master))
+### my answers in [Kotlin](https://www.kotlinlang.org/) (see also [Haskell branch](https://github.com/ephemient/aoc2018/tree/master) and [Python gist](https://gist.github.com/ephemient/f13c80c6a1ccaa0bb6a81554daa5b788))
 
 [![Build Status](https://travis-ci.org/ephemient/aoc2018.svg?branch=kotlin)](https://travis-ci.org/ephemient/aoc2018)
 
