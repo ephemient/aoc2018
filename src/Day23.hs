@@ -2,17 +2,12 @@
 Module:         Day23
 Description:    <https://adventofcode.com/2018/day/23 Day 23: Experimental Emergency Teleportation>
 -}
-{-# LANGUAGE FlexibleContexts, RecordWildCards, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts, RecordWildCards, TypeApplications #-}
 module Day23 (day23a, day23b) where
 
-import Control.Monad (ap, when)
-import Control.Monad.State.Strict (MonadState, execState, get, put)
-import Data.IntSet (IntSet)
-import qualified Data.IntSet as IntSet (singleton, size, union, unions)
-import Data.List (sortOn)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map (delete, elems, fromListWith, mapKeys, mapKeysMonotonic, mapKeysWith, minViewWithKey, partitionWithKey)
-import Data.Maybe (fromJust, listToMaybe)
+import Control.Monad (ap)
+import Data.List (foldl', sortOn)
+import Data.Maybe (listToMaybe)
 import Data.Ord (Down(Down))
 import Debug.Trace (traceShow, traceShowId)
 import Text.Megaparsec (MonadParsec, parseMaybe, sepEndBy)
@@ -21,43 +16,12 @@ import Text.Megaparsec.Char.Lexer (decimal, signed)
 
 data Bot a = Bot {x :: a, y :: a, z :: a, r :: a}
 
-data Volume a = Volume {x0 :: a, x1 :: a, y0 :: a, y1 :: a, z0 :: a, z1 :: a}
-  deriving (Eq, Ord, Show)
-
 parser :: (Integral a, MonadParsec e String m) => m [Bot a]
 parser = flip sepEndBy newline $ Bot
     <$> (string "pos=<" *> signed space decimal)
     <*> (string "," *> signed space decimal)
     <*> (string "," *> signed space decimal)
     <*> (string ">, r=" *> decimal)
-
-measure :: (Num a) => Bot a -> (a, Volume a)
-measure Bot {..} = (boxSize v, v)
-  where v = Volume
-          { x0 = -x + y + z - r, y0 = x - y + z - r, z0 = x + y - z - r
-          , x1 = -x + y + z + r, y1 = x - y + z + r, z1 = x + y - z + r
-          }
-
-(*?) :: (Ord a) => Volume a -> Volume a -> Maybe (Volume a)
-Volume ax0 ax1 ay0 ay1 az0 az1 *? Volume bx0 bx1 by0 by1 bz0 bz1
-  | x0 <= x1, y0 <= y1, z0 <= z1 = Just Volume {..}
-  | otherwise = Nothing
-  where x0 = max ax0 bx0; y0 = max ay0 by0; z0 = max az0 bz0
-        x1 = min ax1 bx1; y1 = min ay1 by1; z1 = min az1 bz1
-
-boxSize :: (Num a) => Volume a -> a
-boxSize Volume {..} = (x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1)
-
-boxToOrigin :: (Integral a, Ord a) => Volume a -> a
-boxToOrigin Volume {..} = minimum
-  [ abs x + abs y + abs z
-  | x <- [(y0 + z0) `div` 2..(y1 + z1) `div` 2]
-  , y <- [(x0 + z0) `div` 2..(x1 + z1) `div` 2]
-  , z <- [(x0 + y0) `div` 2..(x1 + y1) `div` 2]
-  , x0 <= y + z - x, y + z - x <= x1
-  , y0 <= x + z - y, x + z - y <= y1
-  , z0 <= x + y - z, x + y - z <= z1
-  ]
 
 maximumsOn :: (Ord b) => (a -> b) -> [a] -> [a]
 maximumsOn f = map fst . foldl maxGroup [] . (zip `ap` map f)
@@ -75,22 +39,27 @@ day23a input = do
 
 day23b :: String -> Maybe Int
 day23b input = do
-    bots <- parseMaybe @() (parser @Int) input
-    let start = Map.fromListWith IntSet.union $
-            zip (measure <$> bots) (IntSet.singleton <$> [1..])
-    return $ snd $ execState (go start) (0, 0)
-
-go :: (MonadState (Int, a) m, Integral a, Ord a, Show a) => Map (a, Volume a) IntSet -> m ()
-go (Map.minViewWithKey -> Just (((_, v), n), vs)) = record n' v >> go vs' >> go vs
-  where (now, later) = Map.partitionWithKey (\w _ -> v == w) $
-            Map.mapKeysMonotonic fromJust $ Map.delete Nothing $
-            Map.mapKeysWith IntSet.union (\(_, w) -> v *? w) vs
-        n' = IntSet.unions $ n : Map.elems now
-        vs' = Map.mapKeys (\w -> (boxSize w, w)) $ IntSet.union n' <$> later
-go _ = return ()
-
-record :: (MonadState (Int, a) m, Integral a, Ord a, Show a) => IntSet -> Volume a -> m ()
-record n v = do
-    (m, w) <- get
-    when (IntSet.size n > m || IntSet.size n == m && boxToOrigin v < w) $
-        traceShow (n, v) $ put $ traceShowId (IntSet.size n, boxToOrigin v)
+    boxes <- map botToBox <$> parseMaybe @() (parser @Int) input
+    let maxBoxes = map snd $ traceShowId $ maximumsOn fst
+          [ (length overlaps, (lo, foldl' min4 hi overlaps))
+          | (lo, hi) <- boxes
+          , let overlaps = [hi' | (lo', hi') <- boxes, min4 lo lo' == lo', min4 lo hi' == lo]
+          ]
+    return $ minimum $ boxToOrigin <$> traceShowId maxBoxes
+  where botToBox Bot {..} = ((t - r, u - r, v - r, w - r), (t + r, u + r, v + r, w + r))
+          where t = x + y + z; u = x + y - z; v = x - y - z; w = x - y + z
+        min4 (p, q, r, s) (t, u, v, w) = (min p t, min q u, min r v, min s w)
+        boxToOrigin ((p, q, r, s), (t, u, v, w))
+          | traceShow ((x0, y0, z0), (x1, y1, z1)) False = undefined
+          | x0 > 0 && x1 > 0 && y0 > 0 && y1 > 0 && z0 > 0 && z1 > 0 = p
+          | x0 > 0 && x1 > 0 && y0 > 0 && y1 > 0 && z0 < 0 && z1 < 0 = q
+          | x0 > 0 && x1 > 0 && y0 < 0 && y1 < 0 && z0 < 0 && z1 < 0 = r
+          | x0 > 0 && x1 > 0 && y0 < 0 && y1 < 0 && z0 > 0 && z1 > 0 = s
+          | x0 < 0 && x1 < 0 && y0 < 0 && y1 < 0 && z0 < 0 && z1 < 0 = -t
+          | x0 < 0 && x1 < 0 && y0 < 0 && y1 < 0 && z0 > 0 && z1 > 0 = -u
+          | x0 < 0 && x1 < 0 && y0 > 0 && y1 > 0 && z0 > 0 && z1 > 0 = -v
+          | x0 < 0 && x1 < 0 && y0 > 0 && y1 > 0 && z0 < 0 && z1 < 0 = -w
+          | otherwise = error "unimplemented"
+          where (x0, _) = (p + r) `divMod` 2; (x1, _) = (t + v) `divMod` 2
+                (y0, _) = (q - r) `divMod` 2; (y1, _) = (u - v) `divMod` 2
+                (z0, _) = (p - q) `divMod` 2; (z1, _) = (t - u) `divMod` 2

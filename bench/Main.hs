@@ -25,7 +25,6 @@ import Day21 (day21a, day21b)
 import Day22 (day22a, day22b)
 import Day23 (day23a, day23b)
 import Paths_aoc2018 (getDataFileName)
-import System.Environment (lookupEnv)
 
 getDayInput :: Int -> IO String
 getDayInput i = getDataFileName ("day" ++ show i ++ ".txt") >>= readFile
@@ -34,7 +33,7 @@ readDayInput :: (Read a) => Int -> IO a
 readDayInput = fmap read . getDayInput
 
 main :: IO ()
-main = maybe False (not . null) <$> lookupEnv "CI" >>= \ci -> defaultMain
+main = defaultMain
   [ env (getDayInput 1) $ \input -> bgroup "Day 1"
       [ bench "part 1" $ nf day1a input
       , bench "part 2" $ nf day1b input
@@ -121,7 +120,8 @@ main = maybe False (not . null) <$> lookupEnv "CI" >>= \ci -> defaultMain
       [ bench "part 1" $ nf day22a input
       , bench "part 2" $ nf day22b input
       ]
-  , env (getDayInput 23) $ \input -> bgroup "Day 23" $
-        bench "part 1" (nf day23a input) :
-        [bench "part 2" $ nf day23b input | not ci]
+  , env (getDayInput 23) $ \input -> bgroup "Day 23"
+      [ bench "part 1" $ nf day23a input
+      , bench "part 2" $ nf day23b input
+      ]
   ]
