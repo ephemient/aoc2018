@@ -19,7 +19,7 @@ import Text.Megaparsec.Char (alphaNumChar, char, newline, printChar, string)
 import Text.Megaparsec.Char.Lexer (decimal)
 
 data Key s a = Key {team :: s, n :: a}
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
 data Unit a s = Unit
   { count :: a
@@ -30,7 +30,6 @@ data Unit a s = Unit
   , type_ :: s
   , initiative :: Int
   }
-  deriving (Eq, Ord, Show)
 
 parser :: (Integral a, MonadParsec e String m) => m [(Key String Int, Unit a String)]
 parser = concat <$> sepEndBy teamP newline
