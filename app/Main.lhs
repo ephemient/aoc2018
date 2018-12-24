@@ -144,6 +144,10 @@ import Day22 (day22a, day22b)
 ```haskell
 import Day23 (day23a, day23b)
 ```
+## [Day 24: Immune System Simulator 20XX](/src/Day24.hs)
+```haskell
+import Day24 (day24a, day24b)
+```
 
 ---
 
@@ -200,4 +204,5 @@ main = do
     run 21 getDayInput (putStrLn . maybeBottom show) [day21a, day21b]
     run 22 getDayInput (putStrLn . maybeBottom show) [day22a, day22b]
     run 23 getDayInput (putStrLn . maybeBottom show) [day23a, day23b]
+    run 24 getDayInput (putStrLn . maybeBottom show) [day24a, day24b]
 ```
