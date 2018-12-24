@@ -95,6 +95,17 @@ day23a :: String -> Maybe Int
 day23b :: String -> Maybe Int
 
 
+module Day24
+day24a :: String -> Maybe Int
+day24b :: String -> Maybe Int
+instance (GHC.Show.Show a, GHC.Show.Show s) => GHC.Show.Show (Day24.Unit a s)
+instance (GHC.Classes.Ord a, GHC.Classes.Ord s) => GHC.Classes.Ord (Day24.Unit a s)
+instance (GHC.Classes.Eq a, GHC.Classes.Eq s) => GHC.Classes.Eq (Day24.Unit a s)
+instance (GHC.Show.Show s, GHC.Show.Show a) => GHC.Show.Show (Day24.Key s a)
+instance (GHC.Classes.Ord s, GHC.Classes.Ord a) => GHC.Classes.Ord (Day24.Key s a)
+instance (GHC.Classes.Eq s, GHC.Classes.Eq a) => GHC.Classes.Eq (Day24.Key s a)
+
+
 module Day3
 day3a :: String -> Maybe Int
 day3b :: String -> Maybe Int
