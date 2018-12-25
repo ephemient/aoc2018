@@ -11,6 +11,19 @@ data class IntPair(
     }
 }
 
+data class IntTriple(
+    val first: Int,
+    val second: Int,
+    val third: Int
+) : Comparable<IntTriple> {
+    override operator fun compareTo(other: IntTriple): Int = comparator.compare(this, other)
+
+    companion object {
+        private val comparator =
+            compareBy(IntTriple::first).thenBy(IntTriple::second).thenBy(IntTriple::third)
+    }
+}
+
 data class IntPairRange(
     override val start: IntPair,
     override val endInclusive: IntPair
