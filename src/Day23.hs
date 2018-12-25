@@ -9,7 +9,7 @@ import Control.Monad (ap)
 import Control.Monad.State.Strict (execState, get, gets, put)
 import Data.Function (on)
 import Data.IntSet (singleton, size, union, unions)
-import Data.List (sortOn)
+import Data.List (foldl', sortOn)
 import Data.Map.Strict (elems, delete, fromListWith, mapKeysMonotonic, mapKeysWith, maxViewWithKey, partitionWithKey)
 import Data.Maybe (fromJust, listToMaybe)
 import Data.Ord (Down(Down))
@@ -21,6 +21,12 @@ data Bot a = Bot {x :: a, y :: a, z :: a, r :: a}
 
 data Quad a = Quad {xyz :: a, xy'z :: a, x'y'z :: a, x'yz :: a}
   deriving (Eq, Ord)
+
+data Octa a = Octa {lower :: Quad a, upper :: Quad a}
+  deriving (Eq)
+
+instance (Ord a) => Ord (Octa a) where
+    compare = (compare `on` lower) <> (flip compare `on` upper)
 
 parser :: (Integral a, MonadParsec e String m) => m [Bot a]
 parser = flip sepEndBy newline $ Bot
@@ -34,22 +40,27 @@ maximumsOn f = map fst . foldl maxGroup [] . (zip `ap` map f)
   where maxGroup as@((_, y):_) a@(_, x) = case compare x y of LT -> as; EQ -> a:as; GT -> [a]
         maxGroup _ a = [a]
 
-botToOct :: (Num a) => Bot a -> (Quad a, Quad a)
-botToOct Bot {..} = (Quad (t - r) (u - r) (v - r) (w - r), Quad (t + r) (u + r) (v + r) (w + r))
+botToOct :: (Num a) => Bot a -> Octa a
+botToOct Bot {..} = Octa {..}
   where t = x + y + z; u = x + y - z; v = x - y - z; w = x - y + z
+        lower = Quad (t - r) (u - r) (v - r) (w - r)
+        upper = Quad (t + r) (u + r) (v + r) (w + r)
 
-intersect :: (Num a, Ord a) => (Quad a, Quad a) -> (Quad a, Quad a) -> Maybe (Quad a, Quad a)
-intersect (q1, q2) (q3, q4)
-  | p <= t, q <= u, r <= v, s <= w = Just (Quad p q r s, Quad t u v w)
+intersect :: (Num a, Ord a) => Octa a -> Octa a -> Maybe (Octa a)
+intersect (Octa q1 q2) (Octa q3 q4)
+  | p <= t, q <= u, r <= v, s <= w = Just $ Octa (Quad p q r s) (Quad t u v w)
   | otherwise = Nothing
   where p = (max `on` xyz) q1 q3; q = (max `on` xy'z) q1 q3
         r = (max `on` x'y'z) q1 q3; s = (max `on` x'yz) q1 q3
         t = (min `on` xyz) q2 q4; u = (min `on` xy'z) q2 q4
         v = (min `on` x'y'z) q2 q4; w = (min `on` x'yz) q2 q4
 
-octToOrigin :: (Num a, Ord a) => (Quad a, Quad a) -> a
-octToOrigin (Quad p q r s, Quad t u v w) =
-    maximum [(min `on` abs) p t, (min `on` abs) q u, (min `on` abs) r v, (min `on` abs) s w]
+octaToOrigin :: (Num a, Ord a) => Octa a -> a
+octaToOrigin (Octa (Quad p q r s) (Quad t u v w)) = foldl' max 0 $
+    [min (abs p) (abs t) | signum p * signum t >= 0] ++
+    [min (abs q) (abs u) | signum q * signum u >= 0] ++
+    [min (abs r) (abs v) | signum r * signum v >= 0] ++
+    [min (abs s) (abs w) | signum s * signum w >= 0]
 
 day23a :: String -> Maybe Int
 day23a input = do
@@ -71,7 +82,7 @@ day23b input = do
                         mapKeysMonotonic fromJust $ delete Nothing $
                         mapKeysWith union (intersect oct) rest
                     n' = unions $ n : elems super
-                record (size n') $ octToOrigin oct
+                record (size n') $ octaToOrigin oct
                 go $ union n' <$> sub
                 go rest
             _ -> return ()
