@@ -93,8 +93,10 @@ day22b :: String -> Maybe Int
 module Day23
 day23a :: String -> Maybe Int
 day23b :: String -> Maybe Int
+instance GHC.Classes.Eq a => GHC.Classes.Eq (Day23.Octa a)
 instance GHC.Classes.Ord a => GHC.Classes.Ord (Day23.Quad a)
 instance GHC.Classes.Eq a => GHC.Classes.Eq (Day23.Quad a)
+instance GHC.Classes.Ord a => GHC.Classes.Ord (Day23.Octa a)
 
 
 module Day24
