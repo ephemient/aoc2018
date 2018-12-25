@@ -37,7 +37,7 @@ class Day23(lines: List<String>) {
             ) {
                 best = n.size to key.distanceToOrigin
             }
-            stack.add(rest.toSortedMap())
+            stack.add(rest)
             stack.add(sub)
         }
         return best.second
