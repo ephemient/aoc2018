@@ -13,6 +13,7 @@ repositories {
 
 application {
     mainClassName = "io.github.ephemient.aoc2018.MainKt"
+    //applicationDefaultJvmArgs = listOf("-Xmx3072m")
 }
  
 defaultTasks = listOf("test", "run")
