@@ -88,5 +88,5 @@ day23b input = do
             _ -> return ()
         record n m = get >>= \case
             (best, _) | best < n -> put (n, Just m)
-            (best, m') | best == n -> put (n, max m' $ Just m)
+            (best, m') | best == n -> put (n, min m' $ Just m)
             _ -> return ()
