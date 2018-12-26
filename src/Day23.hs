@@ -20,10 +20,10 @@ import Text.Megaparsec.Char.Lexer (decimal, signed)
 data Bot a = Bot {x :: a, y :: a, z :: a, r :: a}
 
 data Quad a = Quad {xyz :: a, xy'z :: a, x'y'z :: a, x'yz :: a}
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 data Octa a = Octa {lower :: Quad a, upper :: Quad a}
-  deriving (Eq)
+  deriving (Eq, Show)
 
 instance (Ord a) => Ord (Octa a) where
     compare = (compare `on` lower) <> (flip compare `on` upper)
@@ -55,12 +55,24 @@ intersect (Octa q1 q2) (Octa q3 q4)
         t = (min `on` xyz) q2 q4; u = (min `on` xy'z) q2 q4
         v = (min `on` x'y'z) q2 q4; w = (min `on` x'yz) q2 q4
 
-octaToOrigin :: (Num a, Ord a) => Octa a -> a
-octaToOrigin (Octa (Quad p q r s) (Quad t u v w)) = foldl' max 0 $
-    [min (abs p) (abs t) | signum p * signum t >= 0] ++
-    [min (abs q) (abs u) | signum q * signum u >= 0] ++
-    [min (abs r) (abs v) | signum r * signum v >= 0] ++
-    [min (abs s) (abs w) | signum s * signum w >= 0]
+octaToOrigin :: (Integral a, Ord a) => Octa a -> a
+octaToOrigin (Octa (Quad p q r s) (Quad t u v w))
+  | p < t && q < u && r < v && s < w = foldl' max 0 $
+        [min (abs p) (abs t) | signum p * signum t >= 0] ++
+        [min (abs q) (abs u) | signum q * signum u >= 0] ++
+        [min (abs r) (abs v) | signum r * signum v >= 0] ++
+        [min (abs s) (abs w) | signum s * signum w >= 0]
+  | otherwise = minimum
+      [ abs x + abs y + abs z
+      | m <- [p..t]
+      , n <- [q..u]
+      , (z, 0) <- [(m - n) `divMod` 2]
+      , o <- [r..v]
+      , (y, 0) <- [(n - o) `divMod` 2]
+      , let (x, 0) = (m + o) `divMod` 2
+      , s <= x - y + z
+      , x - y + z <= w
+      ]
 
 day23a :: String -> Maybe Int
 day23a input = do
