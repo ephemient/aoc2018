@@ -14,7 +14,8 @@ class Day23(lines: List<String>) {
     }
 
     fun part2(): Int? {
-        var best = Pair<Int, Int?>(0, null)
+        var bestCount = 0
+        var bestDistance = mutableListOf<Octa>()
         val stack = mutableListOf(bots.withIndex().groupingBy { it.value.toOcta() }.foldTo(
             destination = sortedMapOf<Octa, MutableSet<Int>>(),
             initialValueSelector = { _, _ -> mutableSetOf() },
@@ -22,7 +23,7 @@ class Day23(lines: List<String>) {
         ))
         while (stack.isNotEmpty()) {
             val units = stack.removeAt(stack.lastIndex)
-            if (units.values.flatMapTo(mutableSetOf()) { it }.size < best.first) continue
+            if (units.values.flatMapTo(mutableSetOf()) { it }.size < bestCount) continue
             val key = units.lastKey()
             val n = units.getValue(key).toMutableSet()
             val rest = units.headMap(key).toSortedMap()
@@ -32,15 +33,16 @@ class Day23(lines: List<String>) {
                 (if (key == key3) n else sub.getOrPut(key3) { mutableSetOf() }).addAll(m)
             }
             sub.values.forEach { it.addAll(n) }
-            if (n.size > best.first ||
-                n.size == best.first && best.second?.takeIf { it <= key.distanceToOrigin } == null
-            ) {
-                best = n.size to key.distanceToOrigin
+            if (n.size > bestCount) {
+                bestCount = n.size
+                bestDistance = mutableListOf(key)
+            } else if (n.size == bestCount) {
+                bestDistance.add(key)
             }
             stack.add(rest)
             stack.add(sub)
         }
-        return best.second
+        return bestDistance.map(Octa::distanceToOrigin).min()
     }
 
     private data class Bot(val x: Int, val y: Int, val z: Int, val r: Int) {
@@ -93,16 +95,38 @@ class Day23(lines: List<String>) {
         }
 
         val distanceToOrigin by lazy {
-            listOfNotNull(
-                minOf(abs(min.first), abs(max.first))
-                    .takeIf { min.first.sign * max.first.sign >= 0 },
-                minOf(abs(min.second), abs(max.second))
-                    .takeIf { min.second.sign * max.second.sign >= 0 },
-                minOf(abs(min.third), abs(max.third))
-                    .takeIf { min.third.sign * max.third.sign >= 0 },
-                minOf(abs(min.fourth), abs(max.fourth))
-                    .takeIf { min.fourth.sign * max.fourth.sign >= 0 }
-            ).max() ?: 0
+            if (min.first < max.first &&
+                min.second < max.second &&
+                min.third < max.third &&
+                min.fourth < max.fourth
+            ) {
+                listOfNotNull(
+                    minOf(abs(min.first), abs(max.first))
+                        .takeIf { min.first.sign * max.first.sign >= 0 },
+                    minOf(abs(min.second), abs(max.second))
+                        .takeIf { min.second.sign * max.second.sign >= 0 },
+                    minOf(abs(min.third), abs(max.third))
+                        .takeIf { min.third.sign * max.third.sign >= 0 },
+                    minOf(abs(min.fourth), abs(max.fourth))
+                        .takeIf { min.fourth.sign * max.fourth.sign >= 0 }
+                ).max() ?: 0
+            } else {
+                requireNotNull(
+                    (min.first..max.first).flatMap { first ->
+                        val parity = first and 1
+                        ((min.second and -2 or parity)..max.second step 2).flatMap { second ->
+                            ((min.third and -2 or parity)..max.third step 2).mapNotNull { third ->
+                                val x = (first + third) / 2
+                                val y = (second - third) / 2
+                                val z = (first - second) / 2
+                                (abs(x) + abs(y) + abs(z)).takeIf {
+                                    x - y + z in min.fourth..max.fourth
+                                }
+                            }
+                        }
+                    }.min()
+                )
+            }
         }
 
         companion object {
