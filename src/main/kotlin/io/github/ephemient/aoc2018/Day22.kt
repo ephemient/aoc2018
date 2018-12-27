@@ -28,7 +28,7 @@ class Day22(lines: List<String>) {
             val key = Pair(pos, tool)
             if (weights[key]?.takeIf { it <= weight } != null) continue
             weights[key] = weight
-            queue.add(Triple(weight + 7, pos, change(get(pos), tool)))
+            queue.add(Triple(weight + 7, pos, 3 - get(pos) - tool))
             for (pos in pos.neighbors) {
                 if (get(pos) != tool) queue.add(Triple(weight + 1, pos, tool))
             }
@@ -66,15 +66,5 @@ class Day22(lines: List<String>) {
                 IntPair(first, second - 1).takeIf { second > 0 },
                 IntPair(first + 1, second), IntPair(first, second + 1)
             )
-
-        private fun change(risk: Int, tool: Int) = when {
-            risk == 0 && tool == 1 -> 2
-            risk == 0 && tool == 2 -> 1
-            risk == 1 && tool == 0 -> 2
-            risk == 1 && tool == 2 -> 0
-            risk == 2 && tool == 0 -> 1
-            risk == 2 && tool == 1 -> 0
-            else -> error("change(risk = $risk, tool = $tool)")
-        }
     }
 }
