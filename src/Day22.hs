@@ -10,7 +10,7 @@ import Data.Array.Unboxed (IArray, Ix, UArray, (!), (//), accumArray, assocs, bo
 import Data.Function (on)
 import qualified Data.Heap as Heap (MinPolicy, insert, singleton, view)
 import qualified Data.Map.Strict as Map (empty, insert, lookup)
-import Data.List ((\\), scanl')
+import Data.List (scanl')
 import Text.Megaparsec (MonadParsec, between, parseMaybe)
 import Text.Megaparsec.Char (char, newline, string)
 import Text.Megaparsec.Char.Lexer (decimal)
@@ -50,21 +50,20 @@ day22b input = do
     (depth, target) <- parseMaybe @() (parser @Int @Int) input
     flip evalState (makeMaze @UArray depth target) $ do
         let bfs (Heap.view -> Just ((_, (w, k@(p, e))), heap), ws)
-              | 1 <- e, (0, 0) <- p = return $ Just w
+              | ((0, 0), 1) <- k = return $ Just w
               | Just w' <- Map.lookup k ws, w' <= Left w = bfs (heap, ws)
               | otherwise = neighbors w p e >>= bfs . commit heap (Map.insert k (Left w) ws)
             bfs _ = return Nothing
             neighbors w p@(x, y) e = do
-                maze <- get
-                let ((0, 0), (maxX, maxY)) = bounds maze
+                maze@(bounds -> ((0, 0), (maxX, maxY))) <- get
                 maze' <- if x < maxX && y < maxY then return maze else
                     let maze' = growMaze depth (grow x maxX, grow y maxY) maze
                     in maze' <$ put maze'
-                return $ [(w + 7, (p, e')) | e' <- [0..2] \\ [risk depth $ maze' ! p, e]] ++
-                    [(w + 1, (p', e)) | x > 0, let p' = (x - 1, y), risk depth (maze' ! p') /= e] ++
-                    [(w + 1, (p', e)) | y > 0, let p' = (x, y - 1), risk depth (maze' ! p') /= e] ++
-                    [(w + 1, (p', e)) | let p' = (x + 1, y), risk depth (maze' ! p') /= e] ++
-                    [(w + 1, (p', e)) | let p' = (x, y + 1), risk depth (maze' ! p') /= e]
+                return $ do
+                    x' <- [max x 1 - 1..x + 1]
+                    y' <- if x == x' then [max y 1 - 1..y + 1] else [y]
+                    let (p', r) = ((x', y'), risk depth $ maze' ! p')
+                    if p == p' then [(w + 7, (p', 3 - r - e))] else [(w + 1, (p', e)) | r /= e]
             commit heap ws = foldr acc (heap, ws)
               where acc a@(w, k@(estimate w -> e)) (heap', ws')
                       | Just w' <- Map.lookup k ws, w' <= Right e = (heap', ws')
