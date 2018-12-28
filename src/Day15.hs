@@ -6,7 +6,7 @@ Description:    <https://adventofcode.com/2018/day/15 Day 15: Beverage Bandits>
 module Day15 (day15a, day15b) where
 
 import Control.Arrow ((&&&), (***))
-import Control.Parallel.Strategies
+import Control.Parallel.Strategies (parBuffer, rseq, withStrategy)
 import Data.Either (partitionEithers)
 import Data.Foldable (asum)
 import Data.Functor.Identity (runIdentity)
