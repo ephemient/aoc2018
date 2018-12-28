@@ -10,43 +10,51 @@ class Day10(lines: List<String>) {
                 val (x, y, dx, dy) = requireNotNull(PATTERN.matchEntire(line)).destructured
                 Point(x.toInt(), y.toInt(), dx.toInt(), dy.toInt())
             }
-        val (i, result, bounds) = generateSequence(points) { it.map { it.step() } }
-            .map { it to checkNotNull(it.bounds()) }
-            .zipWithNext()
-            .withIndex()
-            .first { (_, pair) -> pair.first.second.sizeAsLong < pair.second.second.sizeAsLong }
-            .let { (i, pair) -> Triple(i, pair.first.first, pair.first.second) }
-        val (x0, y0) = bounds.start
-        val (x1, y1) = bounds.endInclusive
-        _part1 = with(Array(y1 - y0 + 1) { BooleanArray(x1 - x0 + 1) }) {
-            for ((x, y) in result) this[y - y0][x - x0] = true
-            joinToString(separator = "\n") {
-                it.joinToString(separator = "") { if (it) "\u2593" else "\u2591" }
+        val times = mutableMapOf<Int, IntHolder>()
+        for ((i, p1) in points.withIndex()) {
+            val (x1, y1, dx1, dy1) = p1
+            for (j in i + 1..points.lastIndex) {
+                val (x2, y2, dx2, dy2) = points[j]
+                if (dx1 != dx2 && (x1 - x2) % (dx2 - dx1) == 0) {
+                    times.getOrPut((x1 - x2) / (dx2 - dx1)) { IntHolder() }.value++
+                }
+                if (dy1 != dy2 && (y1 - y2) % (dy2 - dy1) == 0) {
+                    times.getOrPut((y1 - y2) / (dy2 - dy1)) { IntHolder() }.value++
+                }
             }
         }
-        _part2 = i
+        val t = requireNotNull(times.entries.maxBy { it.value.value }).key
+        var minX = Int.MAX_VALUE
+        var maxX = Int.MIN_VALUE
+        var minY = Int.MAX_VALUE
+        var maxY = Int.MIN_VALUE
+        val results = points.mapTo(mutableSetOf<IntPair>()) { point ->
+            val x = point.x + point.dx * t
+            val y = point.y + point.dy * t
+            if (x < minX) minX = x
+            if (x > maxX) maxX = x
+            if (y < minY) minY = y
+            if (y > maxY) maxY = y
+            IntPair(point.x + point.dx * t, point.y + point.dy * t)
+        }
+        _part1 = (minY..maxY).joinToString(separator = "\n") { y ->
+            (minX..maxX).joinToString(separator = "") { x ->
+                if (IntPair(x, y) in results) "▓" else "░"
+            }
+        }
+        _part2 = t
     }
 
     fun part1(): String = _part1
 
     fun part2(): Int = _part2
 
-    private data class Point(val x: Int, val y: Int, val dx: Int, val dy: Int) {
-        fun step() = copy(x = x + dx, y = y + dy)
-    }
+    private data class Point(val x: Int, val y: Int, val dx: Int, val dy: Int)
+
+    private data class IntHolder(var value: Int = 0)
 
     companion object {
         private val PATTERN =
             """position=<\s*(-?\d+),\s*(-?\d+)> velocity=<\s*(-?\d+),\s*(-?\d+)>""".toRegex()
-
-        private fun Iterable<Point>.bounds() = fold<Point, IntPairRange?>(null) { range, (x, y) ->
-            range?.takeIf { IntPair(x, y) in it } ?: IntPair(
-                if (range == null) x else minOf(range.start.first, x),
-                if (range == null) y else minOf(range.start.second, y)
-            )..IntPair(
-                if (range == null) x else maxOf(range.endInclusive.first, x),
-                if (range == null) y else maxOf(range.endInclusive.second, y)
-            )
-        }
     }
 }
