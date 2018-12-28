@@ -116,17 +116,18 @@ class Day23(lines: List<String>) {
             } else {
                 requireNotNull(
                     (min.first..max.first).flatMap { first ->
-                        val parity = first and 1
-                        ((min.second and -2 or parity)..max.second step 2).flatMap { second ->
-                            ((min.third and -2 or parity)..max.third step 2).mapNotNull { third ->
-                                val x = (first + third) / 2
-                                val y = (second - third) / 2
-                                val z = (first - second) / 2
-                                (abs(x) + abs(y) + abs(z)).takeIf {
-                                    x - y + z in min.fourth..max.fourth
-                                }
+                        (min.second + (first xor min.second and 1)..max.second step 2)
+                            .flatMap { second ->
+                                (min.third + (first xor min.third and 1)..max.third step 2)
+                                    .mapNotNull { third ->
+                                        val x = (first + third) / 2
+                                        val y = (second - third) / 2
+                                        val z = (first - second) / 2
+                                        (abs(x) + abs(y) + abs(z)).takeIf {
+                                            x - y + z in min.fourth..max.fourth
+                                        }
+                                    }
                             }
-                        }
                     }.min()
                 )
             }
