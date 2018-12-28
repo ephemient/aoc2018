@@ -2,12 +2,13 @@
 Module:         Day23
 Description:    <https://adventofcode.com/2018/day/23 Day 23: Experimental Emergency Teleportation>
 -}
-{-# LANGUAGE FlexibleContexts, LambdaCase, RecordWildCards, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, NamedFieldPuns, RecordWildCards, TypeApplications, ViewPatterns #-}
 module Day23 (day23a, day23b) where
 
 import Control.Monad (ap)
 import Control.Monad.State.Strict (execState, get, gets, put)
 import Data.Function (on)
+import qualified Data.Heap as Heap (MaxPolicy, insert, singleton, view)
 import Data.IntSet (singleton, size, union, unions)
 import Data.List (foldl', sortOn)
 import Data.Map.Strict (elems, delete, fromListWith, mapKeysMonotonic, mapKeysWith, maxViewWithKey, partitionWithKey)
@@ -40,8 +41,8 @@ maximumsOn f = map fst . foldl maxGroup [] . (zip `ap` map f)
   where maxGroup as@((_, y):_) a@(_, x) = case compare x y of LT -> as; EQ -> a:as; GT -> [a]
         maxGroup _ a = [a]
 
-botToOct :: (Num a) => Bot a -> Octa a
-botToOct Bot {..} = Octa {..}
+botToOcta :: (Num a) => Bot a -> Octa a
+botToOcta Bot {..} = Octa {..}
   where t = x + y + z; u = x + y - z; v = x - y - z; w = x - y + z
         lower = Quad (t - r) (u - r) (v - r) (w - r)
         upper = Quad (t + r) (u + r) (v + r) (w + r)
@@ -79,26 +80,28 @@ day23a input = do
     bots <- parseMaybe @() (parser @Int) input
     listToMaybe $ sortOn Down
       [ length $ filter test bots
-      | Bot {..} <- maximumsOn r bots
-      , let test Bot {x = x', y = y', z = z'} = abs (x' - x) + abs (y' - y) + abs (z' - z) <= r
+      | Bot {x = x', y = y', z = z', r} <- maximumsOn r bots
+      , let test Bot {x, y, z} = abs (x - x') + abs (y - y') + abs (z - z') <= r
       ]
 
 day23b :: String -> Maybe Int
 day23b input = do
     bots <- parseMaybe @() (parser @Int) input
-    let octs = fromListWith union $ zip (botToOct <$> bots) (singleton <$> [1..])
-    snd $ execState (go octs) (0, Nothing)
-  where go octs@(size . unions . elems -> remaining) = gets fst >>= \case
-            best | best <= remaining, Just ((oct, n), rest) <- maxViewWithKey octs -> do
+    let octs = fromListWith union $ zip (botToOcta <$> bots) (singleton <$> [1..])
+    snd $ execState (go $ Heap.singleton @Heap.MaxPolicy (available octs, octs)) (0, Nothing)
+  where go (Heap.view -> Just ((remaining, octs), heap)) = gets fst >>= \case
+            best | best <= remaining , Just ((oct, n), rest) <- maxViewWithKey octs -> do
                 let (super, sub) = partitionWithKey (\oct' _ -> oct == oct') $
                         mapKeysMonotonic fromJust $ delete Nothing $
                         mapKeysWith union (intersect oct) rest
                     n' = unions $ n : elems super
+                    rest' = union n' <$> sub
                 record (size n') $ octaToOrigin oct
-                go $ union n' <$> sub
-                go rest
+                go $ Heap.insert (available rest', rest') $ Heap.insert (available rest, rest) heap
             _ -> return ()
+        go _ = return ()
         record n m = get >>= \case
             (best, _) | best < n -> put (n, Just m)
             (best, m') | best == n -> put (n, min m' $ Just m)
             _ -> return ()
+        available = size . unions . elems
