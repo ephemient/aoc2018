@@ -2,19 +2,17 @@
 Module:         Day10
 Description:    <https://adventofcode.com/2018/day/10 Day 10: The Stars Align>
 -}
-{-# LANGUAGE FlexibleContexts, NamedFieldPuns, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RecordWildCards, TupleSections, TypeApplications #-}
 module Day10 (day10) where
 
-import Control.Arrow ((&&&))
-import Control.Monad (ap)
-import Data.Array (accumArray, elems)
 import Data.Bool (bool)
-import Data.Foldable (toList)
-import Data.Ix (Ix, rangeSize)
-import Data.List.NonEmpty (NonEmpty, nonEmpty)
-import Data.List.Split (chunksOf)
+import Data.IntMap (assocs, fromListWith)
+import Data.List (sortOn, tails)
+import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (listToMaybe)
+import Data.Ord (Down(Down))
 import Data.Semigroup (Max(Max), Min(Min), sconcat)
+import Data.Set (elems, fromList, member)
 import Text.Megaparsec (MonadParsec, between, parseMaybe, sepEndBy)
 import Text.Megaparsec.Char (char, newline, space, string)
 import Text.Megaparsec.Char.Lexer (decimal, signed)
@@ -28,21 +26,16 @@ parser = flip sepEndBy newline $ between (string "position=<") (char '>') $ Poin
     <*> (string "> velocity=<" *> space *> signed space decimal)
     <*> (char ',' *> space *> signed space decimal)
 
-step :: (Num a) => Point a -> Point a
-step point@Point {..} = point {px = px + px', py = py + py'}
-
-bbox :: (Num a, Ord a) => NonEmpty (Point a) -> ((a, a), (a, a))
-bbox points = ((minY, minX), (maxY, maxX))
-  where (Min minY, Min minX, Max maxY, Max maxX) = sconcat $ project <$> points
-        project Point {px, py} = (Min py, Min px, Max py, Max px)
-
-display :: (Foldable t, Ix a) => ((a, a), (a, a)) -> t (Point a) -> String
-display b@((_, minX), (_, maxX)) = unlines . chunksOf (rangeSize (minX, maxX)) .
-    map (bool '░' '▓') . elems .  accumArray (||) False b . map ((py &&& px) &&& pure True) . toList
-
 day10 :: String -> Maybe (Int, String)
-day10 input = parseMaybe @() (parser @Int) input >>= nonEmpty >>= \points -> listToMaybe
-  [ (i, display b result)
-  | (i, (result, b), (_, b')) <- zip3 [0..] `ap` tail $ (,) `ap` bbox <$> iterate (fmap step) points
-  , rangeSize b < rangeSize b'
-  ]
+day10 input = do
+    points <- parseMaybe @() (parser @Int) input
+    (t, _) <- listToMaybe $ sortOn (Down @Int . snd) $ assocs $ fromListWith (+) $ (, 1) <$> do
+        Point {px = x1, py = y1, px' = dx1, py' = dy1}:rest <- tails points
+        Point {px = x2, py = y2, px' = dx2, py' = dy2} <- rest
+        [t | dx1 /= dx2, (t, 0) <- [(x1 - x2) `divMod` (dx2 - dx1)]] ++
+            [t | dy1 /= dy2, (t, 0) <- [(y1 - y2) `divMod` (dy2 - dy1)]]
+    let results = fromList [(px + px' * t, py + py' * t) | Point {..} <- points]
+        minMaxXY (x, y) = (Min x, Min y, Max x, Max y)
+    (Min minX, Min minY, Max maxX, Max maxY) <- sconcat <$> nonEmpty (minMaxXY <$> elems results)
+    return $ (t,) $ unlines
+        [[bool '░' '▓' $ (x, y) `member` results | x <- [minX..maxX]] | y <- [minY..maxY]]
