@@ -1,5 +1,7 @@
 package io.github.ephemient.aoc2018
 
+import java.util.PriorityQueue
+import java.util.SortedMap
 import kotlin.math.abs
 import kotlin.math.sign
 
@@ -15,15 +17,17 @@ class Day23(lines: List<String>) {
 
     fun part2(): Int? {
         var bestCount = 0
-        var bestDistance = mutableListOf<Octa>()
-        val stack = mutableListOf(bots.withIndex().groupingBy { it.value.toOcta() }.foldTo(
+        val bestDistance = mutableListOf<Octa>()
+        val queue =
+            PriorityQueue(compareBy(Pair<Int, SortedMap<Octa, MutableSet<Int>>>::first).reversed())
+        with(bots.withIndex().groupingBy { it.value.toOcta() }.foldTo(
             destination = sortedMapOf<Octa, MutableSet<Int>>(),
             initialValueSelector = { _, _ -> mutableSetOf() },
             operation = { _, acc, (i, _) -> acc.apply { add(i) } }
-        ))
-        while (stack.isNotEmpty()) {
-            val units = stack.removeAt(stack.lastIndex)
-            if (units.values.flatMapTo(mutableSetOf()) { it }.size < bestCount) continue
+        )) { queue.add(values.flatMapTo(mutableSetOf()) { it }.size to this) }
+        while (queue.isNotEmpty()) {
+            val (count, units) = queue.poll()
+            if (count < bestCount) break
             val key = units.lastKey()
             val n = units.getValue(key).toMutableSet()
             val rest = units.headMap(key).toSortedMap()
@@ -35,12 +39,11 @@ class Day23(lines: List<String>) {
             sub.values.forEach { it.addAll(n) }
             if (n.size > bestCount) {
                 bestCount = n.size
-                bestDistance = mutableListOf(key)
-            } else if (n.size == bestCount) {
-                bestDistance.add(key)
+                bestDistance.clear()
             }
-            stack.add(rest)
-            stack.add(sub)
+            if (n.size == bestCount) bestDistance.add(key)
+            queue.add(rest.values.flatMapTo(mutableSetOf()) { it }.size to rest)
+            queue.add(sub.values.flatMapTo(mutableSetOf()) { it }.size to sub)
         }
         return bestDistance.map(Octa::distanceToOrigin).min()
     }
