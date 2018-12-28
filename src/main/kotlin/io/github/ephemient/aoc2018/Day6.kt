@@ -75,8 +75,12 @@ class Day6(lines: List<String>) {
     fun part2(limit: Int = 10000): Int? {
         val (xs, ys) = input.unzip()
         val radius = limit / input.size
-        val dxs = (minX - radius..maxX + radius).map { x -> xs.sumBy { abs(it - x) } }
-        val dys = (minY - radius..maxY + radius).map { y -> ys.sumBy { abs(it - y) } }
+        val dxs = (minX - radius..maxX + radius).mapNotNull { x ->
+            xs.sumBy { abs(it - x) }.takeIf { it < limit }
+        }
+        val dys = (minY - radius..maxY + radius).mapNotNull { y ->
+            ys.sumBy { abs(it - y) }.takeIf { it < limit }
+        }
         return dxs.sumBy { dx -> dys.count { dy -> dx + dy < limit } }
     }
 
